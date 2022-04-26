@@ -500,9 +500,10 @@ class Response extends \Gsnowhawk\Srm\Receipt
     }
 
     /**
-     * TODO:
-     *  - separate by tax rate
-     *  - support to multiple pages
+     * @todo separate by tax rate
+     * @todo support to multiple pages
+     *
+     * @cli available
      */
     public function remindBilling(): void
     {
