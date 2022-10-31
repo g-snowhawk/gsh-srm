@@ -254,7 +254,7 @@ class Response extends \Gsnowhawk\Srm\Receipt
             }
         } else {
             $post = [];
-            if (preg_match("/^(\d{4}-\d{2}-\d{2}):(\d+)(:(\d+))?$/", $this->request->GET('id'), $match)) {
+            if (preg_match("/^(\d{4}-\d{2}-\d{2}):(\d+)(:(\d+))?$/", $this->request->GET('id') ?? '', $match)) {
                 $draft = empty($this->request->GET('draft')) ? '0' : $this->request->GET('draft');
                 $page_number = (count($match) > 3) ? $match[4] : null;
                 $post = (empty($this->request->GET('cp')))
