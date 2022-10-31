@@ -885,7 +885,7 @@ class Receipt extends \Gsnowhawk\Srm
     {
         return [
             'company' => $userinfo['company'],
-            'division' => $userinfo['division'],
+            'division' => $userinfo['division'] ?? '',
             'fullname' => $userinfo['fullname'],
             'zipcode' => $userinfo['zip'],
             'address1' => $userinfo['state'].$userinfo['city'].$userinfo['town'].$userinfo['address1'],
