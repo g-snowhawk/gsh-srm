@@ -170,7 +170,7 @@ class Template extends \Gsnowhawk\Srm
                 return false;
             }
             if (preg_match('/^base_pdf_(single|multiple)$/', $key, $match)) {
-                $save_path = $this->app->cnf('global:data_dir') . "/srm/$id";
+                $save_path = $this->privateSavePath() . "/srm/$id";
                 if (!file_exists($save_path)) {
                     try {
                         mkdir($save_path, 0777, true);
@@ -185,12 +185,13 @@ class Template extends \Gsnowhawk\Srm
             }
             ++$count;
         }
+
         return $count;
     }
 
     protected function removeFiles($id)
     {
-        $save_path = $this->app->cnf('global:data_dir') . "/srm/$id";
+        $save_path = $this->privateSavePath() . "/srm/$id";
 
         if (!file_exists($save_path)) {
             return true;

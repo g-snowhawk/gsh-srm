@@ -22,12 +22,12 @@ use Gsnowhawk\Common\Mail;
  */
 class Receive extends Response
 {
-    const REDIRECT_MODE = 'srm.receipt.response';
+    public const REDIRECT_MODE = 'srm.receipt.response';
 
     /**
      * Save the data receive interface.
      */
-    public function save() : bool
+    public function save(): bool
     {
         if (!empty($this->request->param('s1_delete'))) {
             return $this->remove();
@@ -55,15 +55,12 @@ class Receive extends Response
                 [[$this->view, 'bind'], ['err', $this->app->err]],
             ];
             $response = [[$this, 'edit'], null];
-        }
-
-        elseif ($this->request->param('s1_addpage')) {
+        } elseif ($this->request->param('s1_addpage')) {
             $response = [[$this, 'edit'], ['addpage']];
             $message_key = null;
-        }
-
-        elseif (!empty($this->request->param('move_page'))) {
-            $redirect_mode .= sprintf(':edit&id=%s:%d:%d&draft=1',
+        } elseif (!empty($this->request->param('move_page'))) {
+            $redirect_mode .= sprintf(
+                ':edit&id=%s:%d:%d&draft=1',
                 date('Y-m-d', strtotime($this->request->param('issue_date'))),
                 $this->request->param('receipt_number'),
                 $this->request->param('move_page')
@@ -307,7 +304,6 @@ class Receive extends Response
             'userkey = ? AND issue_date = ? AND receipt_number = ? AND templatekey = ?',
             [$this->uid, $issue_date, $receipt_number, $receipt_id]
         )) {
-
             $pdf_mapper_source = $this->db->get(
                 'pdf_mapper',
                 'receipt_template',
@@ -328,7 +324,7 @@ class Receive extends Response
                 '0',
             ];
 
-            $total_price = $this->calcurateTotals(implode('-',$key_array));
+            $total_price = $this->calcurateTotals(implode('-', $key_array));
 
             if (false !== $this->app->execPlugin(
                 'afterSaveReceipt',
@@ -384,7 +380,6 @@ class Receive extends Response
 
                 if (preg_match_all('/BEGIN:VEVENT[\s]*(.+?)[\s]*END:VEVENT/s', $output, $matches)) {
                     foreach ($matches[1] as $match) {
-
                         preg_match('/DTSTART;VALUE=DATE:(.+)/', $match, $hit);
                         $start = date('Y', strtotime($hit[1]));
                         $md = date('md', strtotime($hit[1]));

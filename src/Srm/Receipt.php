@@ -36,7 +36,7 @@ class Receipt extends \Gsnowhawk\Srm
      *
      * @return bool
      */
-    protected function save() : bool
+    protected function save(): bool
     {
         $post = $this->request->post();
 
@@ -89,7 +89,7 @@ class Receipt extends \Gsnowhawk\Srm
             // Output the receipt as a PDF
             $after_follow = true;
             if (!empty($post['s1_submit']) && $post['draft'] === '0') {
-                if (false === $this->outputPdf($client_id, implode('-',array_merge($key_array,['0'])))
+                if (false === $this->outputPdf($client_id, implode('-', array_merge($key_array, ['0'])))
                     || false === $this->removeDraftFlag($key_array /*, $old_receipt_number */)
                 ) {
                     $after_follow = false;
@@ -102,7 +102,7 @@ class Receipt extends \Gsnowhawk\Srm
                 }
 
                 $key_array[] = '0';
-                $this->total_price = $this->calcurateTotals(implode('-',$key_array));
+                $this->total_price = $this->calcurateTotals(implode('-', $key_array));
             }
 
             if (false === $this->app->execPlugin('afterSaveReceipt', $post, $this->current_receipt_type, $this->total_price)) {
@@ -111,6 +111,7 @@ class Receipt extends \Gsnowhawk\Srm
 
             if (false !== $after_follow) {
                 $this->clone_receipt_number = $post['receipt_number'];
+
                 return $this->db->commit();
             }
         }
@@ -128,7 +129,7 @@ class Receipt extends \Gsnowhawk\Srm
      *
      * @return bool
      */
-    protected function remove() : bool
+    protected function remove(): bool
     {
         $templatekey = $this->session->param('receipt_id');
         $statement = 'userkey = ? AND templatekey = ? AND issue_date = ? AND receipt_number = ? AND draft = ?';
@@ -138,13 +139,14 @@ class Receipt extends \Gsnowhawk\Srm
 
         if (false === $this->db->delete('receipt', $statement, $options)) {
             $this->db->rollback();
+
             return false;
         }
 
         return $this->db->commit();
     }
 
-    private function saveClientData($post) : string
+    private function saveClientData($post): string
     {
         $table_name = 'receipt_to';
         $system_managed_columns = ['userkey','modified_at'];
@@ -178,13 +180,15 @@ class Receipt extends \Gsnowhawk\Srm
         return 0;
     }
 
-    private function saveReceiptDetails($post) : bool
+    private function saveReceiptDetails($post): bool
     {
         $receipt_id = $this->session->param('receipt_id');
         $lines = $this->db->get('line', 'receipt_template', 'id = ? AND userkey = ?', [$receipt_id, $this->uid]);
 
         $page_number = $this->request->param('page_number');
-        if (empty($page_number)) $page_number = 1;
+        if (empty($page_number)) {
+            $page_number = 1;
+        }
 
         $table_name = 'receipt_detail';
         $receipt_number = $post['new_receipt_number'] ?? $post['receipt_number'];
@@ -256,12 +260,14 @@ class Receipt extends \Gsnowhawk\Srm
         return true;
     }
 
-    private function saveReceiptNote($post) : bool
+    private function saveReceiptNote($post): bool
     {
         $receipt_id = $this->session->param('receipt_id');
 
         $page_number = $this->request->param('page_number');
-        if (empty($page_number)) $page_number = 1;
+        if (empty($page_number)) {
+            $page_number = 1;
+        }
 
         $table_name = 'receipt_note';
         $receipt_number = $post['new_receipt_number'] ?? $post['receipt_number'];
@@ -302,7 +308,7 @@ class Receipt extends \Gsnowhawk\Srm
         return true;
     }
 
-    private function saveReceipt($client_id, $post) : bool
+    private function saveReceipt($client_id, $post): bool
     {
         $table_name = 'receipt';
         $receipt_id = $this->session->param('receipt_id');
@@ -345,7 +351,7 @@ class Receipt extends \Gsnowhawk\Srm
         return true;
     }
 
-    private function newReceiptNumber($issue_date, $draft, $destination = null) : ?int
+    private function newReceiptNumber($issue_date, $draft, $destination = null): ?int
     {
         $receipt_id = (!empty($destination)) ? $destination : $this->session->param('receipt_id');
         if (empty($receipt_id)) {
@@ -365,7 +371,7 @@ class Receipt extends \Gsnowhawk\Srm
         $options_count = count($options);
 
         switch ($this->app->cnf('srm:reset_receipt_number_type')) {
-            case 'fiscal_year' :
+            case 'fiscal_year':
                 $year = date('Y', $timestamp);
                 $start_fiscal_year = $this->app->cnf('srm:start_fiscal_year');
                 if (empty($start_fiscal_year)) {
@@ -380,10 +386,10 @@ class Receipt extends \Gsnowhawk\Srm
                 $issue_date = "$year-$start_fiscal_year";
                 $options[] = date('Y-m-d', strtotime($issue_date));
                 break;
-            case 'year' :
+            case 'year':
                 $options[] = date('Y-01-01', $timestamp);
                 break;
-            case 'month' :
+            case 'month':
                 $options[] = date('Y-m-01', $timestamp);
                 break;
         }
@@ -403,7 +409,7 @@ class Receipt extends \Gsnowhawk\Srm
         return (int)$latest_number + 1;
     }
 
-    protected function outputPdf($client_id, $receiptkey, $preview = null) : bool
+    protected function outputPdf($client_id, $receiptkey, $preview = null): bool
     {
         $encrypt_to = ['modify','copy','annot-forms','fill-forms','extract','assemble','print-high'];
         if (is_null($preview)) {
@@ -427,8 +433,11 @@ class Receipt extends \Gsnowhawk\Srm
         $this->current_receipt_type = (string)$pdf_mapper->attributes()->typeof;
         if ($this->request->param('create-pdf') === 'none') {
             $this->total_price = $this->calcurateTotals($receiptkey);
+
             return true;
         }
+
+        $reduced_tax_mark = $pdf_mapper->reducedtaxmark ?? ' *';
 
         $line_count = (int)$pdf_mapper->detail->attributes()->rows;
         $middlepage_line_count = (int)$pdf_mapper->detail->attributes()->mrows;
@@ -445,11 +454,11 @@ class Receipt extends \Gsnowhawk\Srm
             $detail = [];
             $client = [];
             $fields = $this->db->getFields('receipt');
-            foreach($fields as $field) {
+            foreach ($fields as $field) {
                 $header[$field] = $preview[$field] ?? '';
             }
             $fields = $this->db->getFields('receipt_to');
-            foreach($fields as $field) {
+            foreach ($fields as $field) {
                 $client[$field] = $preview[$field] ?? '';
             }
 
@@ -459,30 +468,47 @@ class Receipt extends \Gsnowhawk\Srm
             }
 
             $page_number = $preview['page_number'] ?? 1;
-            $subtotal = 0;
-            $tax = 0;
-            foreach($preview['content'] as $n => $value) {
+            $subtotal = [
+                'reduced_tax_rate' => 0,
+                'tax_rate' => 0,
+            ];
+            $tax = [
+                'reduced_tax_rate' => 0,
+                'tax_rate' => 0,
+            ];
+            $mark = [
+                'reduced_tax_rate' => $reduced_tax_mark,
+                'tax_rate' => '',
+            ];
+            foreach ($preview['content'] as $n => $value) {
                 $price = $preview['price'][$n] ?? '';
                 $quantity = $preview['quantity'][$n] ?? '';
                 $kind = (($preview['reduced_tax_rate'][$n] ?? '') === '1')
                     ? 'reduced_tax_rate' : 'tax_rate';
                 $tax_rate = $tax_rates[$kind];
                 $sum = (float)$price * (float)$quantity;
-                $subtotal += $sum;
-                $tax += $sum * (float)$tax_rate;
+                $subtotal[$kind] += $sum;
+                $tax[$kind] += $sum * (float)$tax_rate;
                 $detail[$page_number][] = [
                     'page_number' => $page_number,
                     'line_number' => $n,
-                    'content' => $value,
+                    'content' => $value . $mark[$kind],
                     'price' => $preview['price'][$n] ?? '',
                     'quantity' => $preview['quantity'][$n] ?? '',
                     'unit' => $preview['unit'][$n] ?? '',
                     'sum' => (($sum > 0) ? $sum : ''),
                 ];
             }
-            $header['subtotal'] = $subtotal;
-            $header['tax'] = $tax;
-            $header['total'] = $subtotal + $tax + (int)$header['additional_1_price'] + (int)$header['additional_2_price'];
+            $header['subtotal'] = array_sum($subtotal);
+            $header['subtotal1'] = $subtotal['reduced_tax_rate'];
+            $header['subtotal2'] = $subtotal['tax_rate'];
+            $header['tax'] = array_sum($tax);
+            $header['tax1'] = $tax['reduced_tax_rate'];
+            $header['tax2'] = $tax['tax_rate'];
+            $header['total'] = $header['subtotal']
+                + $header['tax']
+                + (int)$header['additional_1_price']
+                + (int)$header['additional_2_price'];
             $header['note'] = $preview['note'] ?? '';
         }
 
@@ -522,7 +548,7 @@ class Receipt extends \Gsnowhawk\Srm
 
         $pdf = new Pdf();
 
-        $template_dir = $this->app->cnf('global:data_dir') . "/srm/$templatekey";
+        $template_dir = $this->privateSavePath() . "/srm/$templatekey";
         $template_file = ($page_count > 1) ? 'multiple.pdf' : 'single.pdf';
         $pdf->loadTemplate("$template_dir/$template_file");
 
@@ -599,7 +625,7 @@ class Receipt extends \Gsnowhawk\Srm
                 $bg = $pdf_mapper->attributes()->bgcolor ?? '#ffffff';
                 $density = 144;
                 $convert = new \Imagick();
-                $convert->setResolution($density,$density);
+                $convert->setResolution($density, $density);
 
                 $tmpfile = tempnam(sys_get_temp_dir(), 'PDF');
                 $pdf->saveFileAs($tmpfile);
@@ -651,6 +677,15 @@ class Receipt extends \Gsnowhawk\Srm
             $pdf->setMetaData($meta);
         }
 
+        //$pdf->setTimeStamp('host', '', '', '/path/to/cert');
+        //$pdf->signing(
+        //    'file:///path/to/cert.crt',
+        //    'file:///path/to/private.key',
+        //    'secret',
+        //    '',
+        //    1
+        //);
+
         $pdf->encrypt($encrypt_to, '', '', 1);
 
         return $pdf->saveFileAs($save_path);
@@ -682,6 +717,9 @@ class Receipt extends \Gsnowhawk\Srm
     private function pdfMapping($node_list, $page, $count, &$files)
     {
         $return_value = [];
+        if (!is_iterable($node_list)) {
+            return $return_value;
+        }
         foreach ($node_list as $node_name => $child_node) {
             if (!is_object($child_node)) {
                 continue;
@@ -690,7 +728,7 @@ class Receipt extends \Gsnowhawk\Srm
             if ($child_node->attributes()->disableif) {
                 $condition = (string)$child_node->attributes()->disableif;
                 if (preg_match('/^(post|get)\.(.*)\s+(eq|ne)\s+(.*)$/', $condition, $match)) {
-                    list ($all, $method, $item, $comparison_operator, $value) = $match;
+                    list($all, $method, $item, $comparison_operator, $value) = $match;
                     switch ($comparison_operator) {
                         case 'eq':
                             if ($this->request->$method($item) === $value) {
@@ -735,35 +773,35 @@ class Receipt extends \Gsnowhawk\Srm
                             $single[$n] = [];
                             foreach ($i_node->attributes() as $key => $attr) {
                                 switch ($key) {
-                                case 'prefix':
-                                case 'suffix':
-                                case 'font':
-                                case 'align':
-                                case 'valign':
-                                case 'style':
-                                case 'size':
-                                case 'type':
-                                    $single[$n][$key] = (string)$attr;
-                                    break;
-                                case 'border':
-                                    $single[$n][$key] = (int)$attr;
-                                    break;
-                                case 'pitch':
-                                case 'x':
-                                case 'y':
-                                case 'width':
-                                case 'height':
-                                case 'maxh':
-                                    $single[$n][$key] = (float)$attr;
-                                    break;
-                                case 'color':
-                                case 'poly':
-                                    $single[$n][$key] = Pdf::mapAttrToArray((string)$attr);
-                                    break;
-                                case 'flg':
-                                case 'ishtml':
-                                    $single[$n][$key] = Pdf::mapAttrToBoolean((string)$attr);
-                                    break;
+                                    case 'prefix':
+                                    case 'suffix':
+                                    case 'font':
+                                    case 'align':
+                                    case 'valign':
+                                    case 'style':
+                                    case 'size':
+                                    case 'type':
+                                        $single[$n][$key] = (string)$attr;
+                                        break;
+                                    case 'border':
+                                        $single[$n][$key] = (int)$attr;
+                                        break;
+                                    case 'pitch':
+                                    case 'x':
+                                    case 'y':
+                                    case 'width':
+                                    case 'height':
+                                    case 'maxh':
+                                        $single[$n][$key] = (float)$attr;
+                                        break;
+                                    case 'color':
+                                    case 'poly':
+                                        $single[$n][$key] = Pdf::mapAttrToArray((string)$attr);
+                                        break;
+                                    case 'flg':
+                                    case 'ishtml':
+                                        $single[$n][$key] = Pdf::mapAttrToBoolean((string)$attr);
+                                        break;
                                 }
                             }
                         }
@@ -862,7 +900,7 @@ class Receipt extends \Gsnowhawk\Srm
                 $sum = (float)$unit['price'] * (int)$unit['quantity'];
                 $subtotal += $sum;
                 $tax += $sum * (float)$unit['tax_rate'];
-                $unit['sum'] = (is_null($unit['price']) && empty($sum)) ? NULL : $sum;
+                $unit['sum'] = (is_null($unit['price']) && empty($sum)) ? null : $sum;
             }
 
             if (!isset($return_value[$page_number])) {
@@ -901,13 +939,16 @@ class Receipt extends \Gsnowhawk\Srm
     {
         $templatekey = $this->session->param('receipt_id');
         $fetch = $this->db->select(
-            "$column_name AS opt", 'receipt',
+            "$column_name AS opt",
+            'receipt',
             "WHERE userkey = ? AND templatekey = ? GROUP BY `$column_name` ORDER BY `$column_name`",
             [$this->uid, $templatekey]
         );
 
         foreach ($fetch as $unit) {
-            if (empty($unit['opt'])) continue;
+            if (empty($unit['opt'])) {
+                continue;
+            }
             $list[] = ['label' => $unit['opt'], 'value' => $unit['opt']];
         }
 
@@ -1024,10 +1065,10 @@ class Receipt extends \Gsnowhawk\Srm
                 if ($key === 'line_number') {
                     continue;
                 }
-                if ($key === 'tax_rate') {
-                    $return_value[$key][$line_number] = 0;
-                    continue;
-                }
+                //if ($key === 'tax_rate') {
+                //    $return_value[$key][$line_number] = 0;
+                //    continue;
+                //}
                 $return_value[$key][$line_number] = $value;
             }
             if (!empty($sum)) {
@@ -1115,6 +1156,7 @@ class Receipt extends \Gsnowhawk\Srm
         if (!empty($destination) && $templatekey !== $destination) {
             if (php_sapi_name() === 'cli') {
                 $this->clone_receipt_number = $clone_receipt_number;
+
                 return true;
             }
 
@@ -1126,7 +1168,7 @@ class Receipt extends \Gsnowhawk\Srm
         return $this->receiptDetail($templatekey, $clone_issue_date, $clone_receipt_number, $page_number, '1', true);
     }
 
-    public function getTaxRate($kind, $issue_date) : float
+    public function getTaxRate($kind, $issue_date): float
     {
         if (false === property_exists($this, $kind)) {
             throw new Exception($kind . ' is unknown proterty');
@@ -1177,9 +1219,12 @@ class Receipt extends \Gsnowhawk\Srm
     protected function receiptIdFromType($type, $with_map = false)
     {
         if (false !== $records = $this->db->select(
-            'id,pdf_mapper', 'receipt_template', 'WHERE userkey = ?', [$this->uid]
+            'id,pdf_mapper',
+            'receipt_template',
+            'WHERE userkey = ?',
+            [$this->uid]
         )) {
-            foreach($records as $record) {
+            foreach ($records as $record) {
                 $pdf_mapper_source = $record['pdf_mapper'];
                 if (!empty($pdf_mapper_source)) {
                     $pdf_mapper = simplexml_load_string($pdf_mapper_source);
@@ -1187,6 +1232,7 @@ class Receipt extends \Gsnowhawk\Srm
                         if ($with_map !== false) {
                             return [(int)$record['id'], $pdf_mapper];
                         }
+
                         return (int)$record['id'];
                     }
                 }
@@ -1199,7 +1245,10 @@ class Receipt extends \Gsnowhawk\Srm
     protected function getPdfMapper($id)
     {
         if (false !== $pdf_mapper_source = $this->db->get(
-            'pdf_mapper', 'receipt_template', 'WHERE id = ?', [$id]
+            'pdf_mapper',
+            'receipt_template',
+            'WHERE id = ?',
+            [$id]
         )) {
             return simplexml_load_string($pdf_mapper_source);
         }

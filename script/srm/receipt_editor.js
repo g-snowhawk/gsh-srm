@@ -11,8 +11,12 @@ const debugLevel = 0;
 
 const formatter = new Intl.NumberFormat('ja-JP');
 const displaySubtotal = document.getElementById('subtotal');
+const displaySubtotal1 = document.getElementById('subtotal-1');
+const displaySubtotal2 = document.getElementById('subtotal-2');
 const displayTotal = document.getElementById('total');
 const displayTax = document.getElementById('tax');
+const displayTax1 = document.getElementById('tax-1');
+const displayTax2 = document.getElementById('tax-2');
 const inputAPrice = document.querySelector('input[name=additional_1_price]');
 const inputBPrice = document.querySelector('input[name=additional_2_price]');
 const inputBillingDate = document.querySelector('input[name=billing_date]');
@@ -224,13 +228,23 @@ function setEventListener() {
         let element = elements[i];
         element.addEventListener('keyup', culculateSubTotals);
     }
+
+    elements = document.querySelectorAll('input[name^=reduced_tax_rate\\[]');
+    for (i = 0; i < elements.length; i++) {
+        let element = elements[i];
+        element.addEventListener('click', culculateSubTotals);
+    }
 }
 
 function culculateSubTotals(event) {
     let i;
     let prices = document.querySelectorAll('input[name^=price\\[]');
     let subtotal = 0;
+    let subtotal1= 0;
+    let subtotal2= 0;
     let taxtotal = 0;
+    let taxtotal1 = 0;
+    let taxtotal2 = 0;
 
     const carryForward = document.querySelector('input[name=carry_forward]');
     if (carryForward) {
@@ -259,16 +273,27 @@ function culculateSubTotals(event) {
 
         let sum = price * quantity;
         displaySum.innerHTML = (sum === 0) ? '' : formatter.format(sum);
-        subtotal += sum;
 
         let inputReducedTaxRate = document.querySelector('input[name=reduced_tax_rate\\[' + n + '\\]]');
         let rate = (inputReducedTaxRate.checked) ? reducedTaxRate : taxRate;
         if (!isNaN(rate)) {
-            taxtotal += sum * rate;
+            if (rate === taxRate) {
+                subtotal1 += sum;
+                taxtotal1 += sum * rate;
+            } else {
+                subtotal2 += sum;
+                taxtotal2 += sum * rate;
+            }
         }
+        subtotal = subtotal1 + subtotal2;
+        taxtotal = taxtotal1 + taxtotal2;
     }
     displaySubtotal.innerHTML = (subtotal === 0) ? '' : formatter.format(subtotal);
+    displaySubtotal1.innerHTML = (subtotal1 === 0) ? '' : '<sub>' + (taxRate * 100) + '%</sub>' + formatter.format(subtotal1);
+    displaySubtotal2.innerHTML = (subtotal2 === 0) ? '' : '<sub>' + (reducedTaxRate * 100) + '%</sub>' + formatter.format(subtotal2);
     displayTax.innerHTML = (taxtotal === 0) ? '' : formatter.format(Math.ceil(taxtotal));
+    displayTax1.innerHTML = (taxtotal1 === 0) ? '' : '<sub>' + (taxRate * 100) + '%</sub>' + formatter.format(Math.ceil(taxtotal1));
+    displayTax2.innerHTML = (taxtotal2 === 0) ? '' : '<sub>' + (reducedTaxRate * 100) + '%</sub>' + formatter.format(Math.ceil(taxtotal2));
 
     culculateTotals(event);
 }

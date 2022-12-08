@@ -25,7 +25,7 @@ final class setup extends \Gsnowhawk\PackageSetup
     /**
      * Current version number.
      */
-    const VERSION = '1.0.0';
+    public const VERSION = '1.0.0';
 
     /**
      * Object constructor.

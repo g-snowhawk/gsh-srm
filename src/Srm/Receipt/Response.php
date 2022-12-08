@@ -21,9 +21,9 @@ use Gsnowhawk\Common\Mail;
  */
 class Response extends \Gsnowhawk\Srm\Receipt
 {
-    const QUERY_STRING_KEY = 'receipt_search_condition';
-    const SEARCH_OPTIONS_KEY = 'receipt_search_options';
-    const RECEIPT_PAGE_KEY = 'receipt_page';
+    public const QUERY_STRING_KEY = 'receipt_search_condition';
+    public const SEARCH_OPTIONS_KEY = 'receipt_search_options';
+    public const RECEIPT_PAGE_KEY = 'receipt_page';
 
     private $rows_per_page = 10;
 
@@ -303,8 +303,10 @@ class Response extends \Gsnowhawk\Srm\Receipt
         }
 
         // Set the TaxRate by issue_date
+        $taxes = [];
         foreach (['tax_rate','reduced_tax_rate'] as $kind) {
-            $this->view->bind($kind, $this->getTaxRate($kind, $post['issue_date']));
+            $taxes[$kind] = $this->getTaxRate($kind, $post['issue_date']);
+            $this->view->bind($kind, $taxes[$kind]);
         }
 
         $draft = $this->request->param('draft');
@@ -312,6 +314,10 @@ class Response extends \Gsnowhawk\Srm\Receipt
             $draft = '0';
         }
 
+        $post['reduced_tax_rate'] = [];
+        foreach ($post['tax_rate'] ?? [] as $n => $value) {
+            $post['reduced_tax_rate'][$n] = ($value === strval($taxes['reduced_tax_rate'])) ? '1' : '0';
+        }
 
         if ($add_page === 'addpage') {
             $page_count = (int)$page_count + 1;
@@ -422,7 +428,9 @@ class Response extends \Gsnowhawk\Srm\Receipt
 
         if (empty($query_string)) {
             $this->session->clear(self::QUERY_STRING_KEY);
-            if (is_null($query_string)) return null;
+            if (is_null($query_string)) {
+                return null;
+            }
         }
 
         return mb_convert_kana($query_string, 's');
@@ -566,13 +574,12 @@ class Response extends \Gsnowhawk\Srm\Receipt
 
         $this->view->bind('billing_date', time());
 
-        foreach($data as $uname => $clients) {
+        foreach ($data as $uname => $clients) {
             $this->resetUserByCli($uname);
             $this->session->param('receipt_id', $bill[$uname]['id']);
 
             $draft_bills = [];
             foreach ($clients as $client => $list) {
-
                 $to = $this->db->get('*', 'receipt_to', 'id = ?', [$client]);
                 if (empty($to)) {
                     continue;
@@ -584,7 +591,6 @@ class Response extends \Gsnowhawk\Srm\Receipt
                 $this->request->param('receipt_number', null, true);
 
                 if (count($list) === 1) {
-
                     $page_number = 1;
 
                     if (false === $this->cloneReceipt(
@@ -605,7 +611,7 @@ class Response extends \Gsnowhawk\Srm\Receipt
                     continue;
                 }
 
-                foreach($client_fields as $field) {
+                foreach ($client_fields as $field) {
                     $this->request->param($field, ($to[$field] ?? ''));
                 }
 
@@ -650,7 +656,7 @@ class Response extends \Gsnowhawk\Srm\Receipt
                 $mail = new Mail();
                 $mail->from(Mail::noreplyAt());
                 if (preg_match_all('/^([^:]+):\s*([^\r\n]+)/', $header, $match)) {
-                    foreach($match[1] as $i => $key) {
+                    foreach ($match[1] as $i => $key) {
                         $func = strtolower($key);
                         if (method_exists($mail, $func)) {
                             $mail->$func($match[2][$i]);

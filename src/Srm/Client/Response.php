@@ -69,10 +69,13 @@ class Response extends \Gsnowhawk\Srm\Client
             $post = $this->db->get(
                 'id, company, division, fullname, zip, state, city, town,
                  address1, address2, tel, fax, create_date, modify_date',
-                'user', 'id = ?', [$this->request->param('id')]
+                'user',
+                'id = ?',
+                [$this->request->param('id')]
             );
             $stat = $this->db->select(
-                '*', 'permission',
+                '*',
+                'permission',
                 'WHERE userkey = ? AND application IN (?,?)',
                 [$this->request->param('id'), '', $this->currentApp()]
             );

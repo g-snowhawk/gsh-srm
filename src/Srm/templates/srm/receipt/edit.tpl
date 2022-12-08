@@ -91,12 +91,20 @@
         </thead>
         <tfoot>
           <tr>
-            <td colspan="2" rowspan="5"><textarea name="note" class="fixed-size-to-parent" placeholder="備考">{{ post.note }}</textarea></td>
-            <td colspan="3"><div class="label">小計</div></td>
+            <td colspan="2" rowspan="7"><textarea name="note" class="fixed-size-to-parent" placeholder="備考">{{ post.note }}</textarea></td>
+            <td><div class="label">小計</div></td>
+            <td colspan="2" class="small">
+              <div class="value" id="subtotal-1">{{ subtotal_1 }}</div>
+              <div class="value" id="subtotal-2">{{ subtotal_2 }}</div>
+            </td>
             <td><div class="value" id="subtotal">{{ subtotal }}</div></td>
           </tr>
           <tr>
-            <td colspan="3"><div class="label">消費税</div></td>
+            <td><div class="label">消費税</div></td>
+            <td colspan="2" class="small">
+              <div class="value" id="tax-1">{{ tax_1 }}</div>
+              <div class="value" id="tax-2">{{ tax_2 }}</div>
+            </td>
             <td><div class="value" id="tax">{{ tax }}</div></td>
           </tr>
           <tr>

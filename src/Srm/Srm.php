@@ -31,7 +31,7 @@ class Srm extends User implements PackageInterface
     /**
      * Application default mode.
      */
-    const DEFAULT_MODE = 'srm.receipt.response';
+    public const DEFAULT_MODE = 'srm.receipt.response';
 
     protected $command_convert = null;
 
@@ -51,8 +51,7 @@ class Srm extends User implements PackageInterface
 
         if (class_exists('Imagick')) {
             $this->command_convert = 'imagick';
-        }
-        else {
+        } else {
             $convert = $this->app->cnf('external_command:convert');
             if (!empty($convert)) {
                 $disable_functions = Text::explode(',', ini_get('disable_functions'));
@@ -77,6 +76,7 @@ class Srm extends User implements PackageInterface
     final public static function getDefaultMode($app)
     {
         $mode = $app->cnf('application:default_mode');
+
         return (!empty($mode)) ? $mode : self::DEFAULT_MODE;
     }
 
@@ -205,7 +205,7 @@ class Srm extends User implements PackageInterface
 
     protected function pathToID($path)
     {
-        return trim(str_replace(['/','.'], ['-','_'], preg_replace('/\.html?$/','',$path)), '-_');
+        return trim(str_replace(['/','.'], ['-','_'], preg_replace('/\.html?$/', '', $path)), '-_');
     }
 
     public function receipts()
@@ -242,7 +242,9 @@ class Srm extends User implements PackageInterface
     {
         $banks = $this->db->select(
             'account_number,bank,branch,account_type',
-            'bank', 'WHERE userkey = ?', [$this->uid]
+            'bank',
+            'WHERE userkey = ?',
+            [$this->uid]
         );
 
         $bank_list = [];

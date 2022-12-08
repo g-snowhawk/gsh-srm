@@ -95,7 +95,7 @@ class Client extends \Gsnowhawk\Srm
                 $this->db->nsmBeforeInsertChildSQL('user')
             );
 
-            if (   false !== $update_parent->execute(['parent_rgt' => $parent_rgt, 'offset' => 2])
+            if (false !== $update_parent->execute(['parent_rgt' => $parent_rgt, 'offset' => 2])
                 && false !== $result = $this->db->insert($table, $save, $raw)
             ) {
                 $post['id'] = $this->db->lastInsertId(null, 'id');

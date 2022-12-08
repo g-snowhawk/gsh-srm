@@ -20,7 +20,7 @@ use Gsnowhawk\Common\Lang;
  */
 class Receive extends Response
 {
-    const REDIRECT_MODE = 'srm.bank.response';
+    public const REDIRECT_MODE = 'srm.bank.response';
 
     /**
      * Save the data receive interface.

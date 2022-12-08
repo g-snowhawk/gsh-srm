@@ -1,4 +1,5 @@
 <?php
+
 $notes = <<<SQL
 SELECT rc.*,nt.note
   FROM table::receipt rc

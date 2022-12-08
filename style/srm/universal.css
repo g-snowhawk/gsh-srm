@@ -133,6 +133,10 @@ table.receipt-detail td {
   border: 1px solid #ccc;
   padding: 0;
 }
+table.receipt-detail td.small {
+  padding: 0 0.5em;
+  text-align: right;
+}
 table.receipt-detail thead td {
   font-size: .75rem;
   line-height: 1;
@@ -199,6 +203,19 @@ table.receipt-detail tfoot td div.value {
   font-size: .75rem;
   padding: .5em;
   text-align: right;
+}
+table.receipt-detail tfoot td.small div.value {
+  display: flex;
+  font-size: 0.7em;
+  justify-content: space-between;
+  line-height: 1;
+  margin-top: 0.2em;
+  padding: 0;
+}
+table.receipt-detail tfoot td.small div.value sub {
+  color: #999;
+  margin-right: 0.2em;
+  vertical-align: bottom;
 }
 table.receipt-detail tfoot td input {
   font-size: .75rem;

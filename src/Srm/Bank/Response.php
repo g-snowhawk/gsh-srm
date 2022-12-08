@@ -37,7 +37,7 @@ class Response extends \Gsnowhawk\Srm\Bank
     /**
      * Default view.
      */
-    public function defaultView() : void
+    public function defaultView(): void
     {
         $this->checkPermission('srm.bank.read');
 
@@ -60,7 +60,7 @@ class Response extends \Gsnowhawk\Srm\Bank
     /**
      * Edit view.
      */
-    public function edit() : vold
+    public function edit(): vold
     {
         $id = $this->request->param('id');
         $privilege_type = (empty($id)) ? 'create' : 'update';
