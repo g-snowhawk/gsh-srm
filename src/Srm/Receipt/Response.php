@@ -380,7 +380,7 @@ class Response extends \Gsnowhawk\Srm\Receipt
         if (preg_match("/^(\d{4}-\d{2}-\d{2}):(\d+)(:(\d+))?$/", $this->request->GET('id'), $match)) {
             $issue_date = $match[1];
             $receipt_number = $match[2];
-            $templatekey = $this->session->param('receipt_id');
+            $templatekey = $match[4] ?? $this->session->param('receipt_id');
 
             $pdf_mapper_source = $this->db->get('pdf_mapper', 'receipt_template', 'id = ? AND userkey = ?', [$templatekey, $this->uid]);
             if (empty($pdf_mapper_source)) {
