@@ -425,6 +425,14 @@ ul.button-list li a:hover {
   display: inline;
   font-size: .75rem;
 }
+#srm-receipt-default .section-list section .billing-date {
+  color: #808080;
+  display: inline;
+  font-size: .75rem;
+}
+#srm-receipt-default .section-list section .billing-date.future {
+  color: #96f;
+}
 #srm-receipt-default .section-list section .bill-info {
   color: #333;
   font-size: .8rem;

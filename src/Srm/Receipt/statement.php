@@ -2,7 +2,7 @@
 
 $statement = <<<SQL
 SELECT r.issue_date,r.receipt_number,r.subject,r.draft,
-       r.due_date,r.receipt,r.unavailable,
+       r.due_date,r.receipt,r.billing_date,r.unavailable,
        c.company,
        {$collected} AS collected
   FROM {$receipt} AS r
