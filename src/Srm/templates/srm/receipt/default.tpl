@@ -8,6 +8,9 @@
         <input type="hidden" name="mode" value="srm.receipt.receive:sendmail">
         <input type="hidden" name="from">
         <input type="hidden" name="reply-to">
+        <input type="hidden" name="issue_date">
+        <input type="hidden" name="receipt_number">
+        <input type="hidden" name="templatekey">
         <div class="controller">
           <input type="reset" value="キャンセル">
           <input type="submit" value="送信">
@@ -31,7 +34,7 @@
         <section{% if unit.unavailable == "1"%} class="unavailable"{% endif %}>
           <h2>{{ unit.subject }}</h2>
           <h3>{{ unit.company }}</h3>
-          <p>No.{{ unit.receipt_number }}&nbsp;発行日：{{ unit.issue_date|date('Y年m月d日') }}{% if mail == 'enable' and unit.draft != '1' and unit.unavailable != '1' %}&nbsp;<a href="?mode=srm.receipt.response:mailer&id={{ unit.issue_date|date('Y-m-d') ~ ':' ~ unit.receipt_number }}" class="run-mailer">E-mail</a>{% endif %}</p>
+          <p>No.{{ unit.receipt_number }}&nbsp;発行日：{{ unit.issue_date|date('Y年m月d日') }}{% if mail == 'enable' and unit.draft != '1' and unit.unavailable != '1' %}&nbsp;<a href="?mode=srm.receipt.response:mailer&id={{ unit.issue_date|date('Y-m-d') ~ ':' ~ unit.receipt_number }}" class="run-mailer{% if unit.logtime is not empty %} log-exists" data-content="最終送信日:{{ unit.logtime|date('Y年m月d日') }}{% endif %}">E-mail</a>{% endif %}</p>
           {% if unit.billing_date is not empty %}
             <p class="billing-date{% if unit.billing_date >= date() %} future{% endif %}">締日：{{ unit.billing_date|date('Y年m月d日') }}</p>
           {% endif %}

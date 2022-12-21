@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `table::receipt_detail` (
   KEY `table::receipt_detail_ibfk_3` (`issue_date`,`receipt_number`,`userkey`,`templatekey`,`draft`),
   CONSTRAINT `table::receipt_detail_ibfk_1` FOREIGN KEY (`userkey`) REFERENCES `table::user` (`id`),
   CONSTRAINT `table::receipt_detail_ibfk_2` FOREIGN KEY (`templatekey`) REFERENCES `table::receipt_template` (`id`),
-  CONSTRAINT `tms_receipt_detail_ibfk_3` FOREIGN KEY (`issue_date`, `receipt_number`, `userkey`, `templatekey`, `draft`) REFERENCES `tms_receipt` (`issue_date`, `receipt_number`, `userkey`, `templatekey`, `draft`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `table::receipt_detail_ibfk_3` FOREIGN KEY (`issue_date`, `receipt_number`, `userkey`, `templatekey`, `draft`) REFERENCES `table::receipt` (`issue_date`, `receipt_number`, `userkey`, `templatekey`, `draft`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `table::receipt_note` (
@@ -120,7 +120,18 @@ CREATE TABLE IF NOT EXISTS `table::receipt_note` (
   KEY `table::receipt_note_ibfk_3` (`issue_date`,`receipt_number`,`userkey`,`templatekey`,`draft`),
   CONSTRAINT `table::receipt_note_ibfk_1` FOREIGN KEY (`userkey`) REFERENCES `table::user` (`id`),
   CONSTRAINT `table::receipt_note_ibfk_2` FOREIGN KEY (`templatekey`) REFERENCES `table::receipt_template` (`id`),
-  CONSTRAINT `tms_receipt_note_ibfk_3` FOREIGN KEY (`issue_date`, `receipt_number`, `userkey`, `templatekey`, `draft`) REFERENCES `tms_receipt` (`issue_date`, `receipt_number`, `userkey`, `templatekey`, `draft`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `table:;receipt_note_ibfk_3` FOREIGN KEY (`issue_date`, `receipt_number`, `userkey`, `templatekey`, `draft`) REFERENCES `table::receipt` (`issue_date`, `receipt_number`, `userkey`, `templatekey`, `draft`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `table::receipt_mail_log` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `issue_date` date NOT NULL,
+  `receipt_number` int unsigned NOT NULL,
+  `userkey` int unsigned NOT NULL,
+  `templatekey` int unsigned NOT NULL,
+  `logtime` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `table:;receipt_mail_log_ibfk_1` FOREIGN KEY (`issue_date`, `receipt_number`, `userkey`, `templatekey`) REFERENCES `table::receipt` (`issue_date`, `receipt_number`, `userkey`, `templatekey`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `table::tax_rates` (

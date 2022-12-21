@@ -279,11 +279,25 @@ class Receive extends Response
         if (false === $mail->send()) {
             $json['status'] = 1;
             $json['message'] = 'Server Error';
+        } else {
+            $this->mailLog();
         }
 
         header('Content-type: application/json; charset=utf-8');
         echo json_encode($json);
         exit;
+    }
+
+    private function mailLog(): void
+    {
+        if (false === $this->db->insert('receipt_mail_log', [
+            'issue_date' => $this->request->param('issue_date'),
+            'receipt_number' => $this->request->param('receipt_number'),
+            'userkey' => $this->uid,
+            'templatekey' => $this->request->param('templatekey'),
+        ])) {
+            trigger_error($this->db->error());
+        }
     }
 
     public function updateReceipt(): void

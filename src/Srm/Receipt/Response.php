@@ -167,6 +167,21 @@ class Response extends \Gsnowhawk\Srm\Receipt
             $this->db->execute($options);
 
             $receipts = $this->db->fetchAll();
+
+            // Mail log
+            foreach ($receipts as &$receipt) {
+                $logtime = $this->db->get(
+                    'logtime',
+                    'receipt_mail_log',
+                    'issue_date = ? AND receipt_number = ? AND userkey = ? AND templatekey = ? ORDER BY logtime DESC LIMIT 1',
+                    [$receipt['issue_date'], $receipt['receipt_number'], $this->uid, $receipt_id]
+                );
+                if (!empty($logtime)) {
+                    $receipt['logtime'] = $logtime;
+                }
+            }
+            unset($receipt);
+
             $this->view->bind('receipts', $receipts);
 
             $this->setHtmlId('srm-receipt-default');
@@ -455,7 +470,7 @@ class Response extends \Gsnowhawk\Srm\Receipt
 
             if (!empty($mail_template)) {
                 $unit = $this->db->get(
-                    'issue_date,receipt_number,client_id,subject,due_date',
+                    'issue_date,receipt_number,templatekey,client_id,subject,due_date',
                     'receipt',
                     'userkey = ? AND templatekey = ? AND issue_date = ? AND receipt_number = ?',
                     [$this->uid, $templatekey, $issue_date, $receipt_number]
@@ -499,6 +514,9 @@ class Response extends \Gsnowhawk\Srm\Receipt
 
                 $json['template'] = $template;
                 $json['token'] = $this->session->param('ticket');
+                $json['headers']['issue_date'] = $unit['issue_date'];
+                $json['headers']['receipt_number'] = $unit['receipt_number'];
+                $json['headers']['templatekey'] = $unit['templatekey'];
             }
         }
 
