@@ -35,6 +35,11 @@ class Response extends \Gsnowhawk\Srm\Receipt
         $params = func_get_args();
         call_user_func_array('parent::__construct', $params);
 
+        if (is_null($this->view) && php_sapi_name() === 'cli') {
+            $this->session->param('application_name', parent::packageName());
+            $this->app->restoreView();
+        }
+
         $this->view->bind(
             'header',
             ['title' => Lang::translate('HEADER_TITLE'), 'id' => 'template', 'class' => 'template']
