@@ -33,12 +33,12 @@ class Response extends \Gsnowhawk\Srm\Receipt
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
 
-        if (is_null($this->view) && php_sapi_name() === 'cli') {
-            $this->session->param('application_name', parent::packageName());
-            $this->app->restoreView();
-        }
+        //if (is_null($this->view) && php_sapi_name() === 'cli') {
+        //    $this->session->param('application_name', parent::packageName());
+        //    $this->app->restoreView();
+        //}
 
         $this->view->bind(
             'header',

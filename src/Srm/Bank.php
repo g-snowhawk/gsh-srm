@@ -26,11 +26,11 @@ class Bank extends \Gsnowhawk\Srm
     /**
      * Object Constructer.
      */
-    //public function __construct()
-    //{
-    //    $params = func_get_args();
-    //    call_user_func_array('parent::__construct', $params);
-    //}
+    public function __construct()
+    {
+        $params = func_get_args();
+        call_user_func_array(parent::class.'::__construct', $params);
+    }
 
     /**
      * Save the data.
