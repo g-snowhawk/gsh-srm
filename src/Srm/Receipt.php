@@ -94,6 +94,7 @@ class Receipt extends \Gsnowhawk\Srm
                 ) {
                     $after_follow = false;
                 }
+                $total_price = $this->calcurateTotals(implode('-', array_merge($key_array, [$post['draft']])), true);
             } elseif (!empty($post['receipt'])) {
                 $pdf_mapper_source = $this->db->get('pdf_mapper', 'receipt_template', 'id = ? AND userkey = ?', [$this->session->param('receipt_id'), $this->uid]);
                 if (!empty($pdf_mapper_source)) {
@@ -102,10 +103,11 @@ class Receipt extends \Gsnowhawk\Srm
                 }
 
                 $key_array[] = '0';
-                $this->total_price = $this->calcurateTotals(implode('-', $key_array));
+                $total_price = $this->calcurateTotals(implode('-', $key_array), true);
+                $this->total_price = array_sum($total_price);
             }
 
-            if (false === $this->app->execPlugin('afterSaveReceipt', $post, $this->current_receipt_type, $this->total_price)) {
+            if (false === $this->app->execPlugin('afterSaveReceipt', $post, $this->current_receipt_type, $total_price)) {
                 $after_follow = false;
             }
 
@@ -978,7 +980,7 @@ class Receipt extends \Gsnowhawk\Srm
         }
     }
 
-    protected function calcurateTotals($receiptkey)
+    protected function calcurateTotals($receiptkey, bool $detail = false)
     {
         $statement = "CONCAT(issue_date,'-',receipt_number,'-',userkey,'-',templatekey,'-',draft) = ?";
         $header = $this->db->get(
@@ -1003,7 +1005,22 @@ class Receipt extends \Gsnowhawk\Srm
             $tax += $sum * (float)$unit['tax_rate'];
         }
 
-        return $subtotal + $tax + (int)$header['additional_1_price'] + (int)$header['additional_2_price'];
+        if (false === $header || false === $detail) {
+            trigger_error($receiptkey, E_USER_ERROR);
+        }
+
+        $total = [
+            'subtotal' => $subtotal,
+            'tax' => $tax,
+            'additional_1_price' => (int)$header['additional_1_price'] ?? 0,
+            'additional_2_price' => (int)$header['additional_2_price'] ?? 0,
+        ];
+
+        if (false !== $detail) {
+            return $total;
+        }
+
+        return array_sum($total);
     }
 
     private function removeDraftFlag($options)
