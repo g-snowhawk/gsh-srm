@@ -86,6 +86,8 @@ class Receipt extends \Gsnowhawk\Srm
             $key_array[] = $this->uid;
             $key_array[] = $this->session->param('receipt_id');
 
+            $total_price = 0;
+
             // Output the receipt as a PDF
             $after_follow = true;
             if (!empty($post['s1_submit']) && $post['draft'] === '0') {
