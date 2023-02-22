@@ -36,7 +36,7 @@
           <h3>{{ unit.company }}</h3>
           <p>No.{{ unit.receipt_number }}&nbsp;発行日：{{ unit.issue_date|date('Y年m月d日') }}{% if mail == 'enable' and unit.draft != '1' and unit.unavailable != '1' %}&nbsp;<a href="?mode=srm.receipt.response:mailer&id={{ unit.issue_date|date('Y-m-d') ~ ':' ~ unit.receipt_number }}" class="run-mailer{% if unit.logtime is not empty %} log-exists" data-content="最終送信日:{{ unit.logtime|date('Y年m月d日') }}{% endif %}">E-mail</a>{% endif %}</p>
           {% if unit.billing_date is not empty %}
-            <p class="billing-date{% if date(unit.billing_date) >= date() %} future{% endif %}">締日：{{ unit.billing_date|date('Y年m月d日') }}</p>
+            <p class="billing-date{% if date(unit.billing_date) >= date('now'|date('Y-m-d 00:00:00')) %} future{% endif %}">締日：{{ unit.billing_date|date('Y年m月d日') }}</p>
           {% endif %}
           {% if typeOf == 'bill' or typeOf == 'receipt' %}
             <p class="bill-info{% if unit.unavailable == '1' %} strike{% endif %}">
