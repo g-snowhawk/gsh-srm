@@ -520,8 +520,12 @@ class Receipt extends \Gsnowhawk\Srm
 
         if (property_exists($pdf_mapper, 'bank')) {
             $bank = $this->db->get('*', 'bank', 'account_number = ? AND userkey = ?', [$header['bank_id'], $this->uid]);
-            $bank['branch'] .= ' (' . $bank['branch_code'] . ')';
-            $bank['label'] = $pdf_mapper->bank->firstpage->account_holder->attributes()->label;
+            if (!empty($bank)) {
+                $bank['branch'] .= ' (' . $bank['branch_code'] . ')';
+                $bank['label'] = $pdf_mapper->bank->firstpage->account_holder->attributes()->label;
+            } else {
+                $bank = ['branch' => '', 'branch_code' => '', 'label' => ''];
+            }
         }
 
         if (!empty($header['note'])) {
