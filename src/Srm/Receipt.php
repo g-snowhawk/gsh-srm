@@ -441,7 +441,7 @@ class Receipt extends \Gsnowhawk\Srm
             return true;
         }
 
-        $reduced_tax_mark = $pdf_mapper->reducedtaxmark ?? ' *';
+        $reduced_tax_mark = $pdf_mapper->reducedtaxmark ?? '*';
 
         $line_count = (int)$pdf_mapper->detail->attributes()->rows;
         $middlepage_line_count = (int)$pdf_mapper->detail->attributes()->mrows;
@@ -453,6 +453,42 @@ class Receipt extends \Gsnowhawk\Srm
             $header['note'] = $this->db->get('content', 'receipt_note', "CONCAT(issue_date,'-',receipt_number,'-',userkey,'-',templatekey,'-',draft) = ?", [$receiptkey]);
             $detail = $this->receiptDetailsForPdf($receiptkey, $line_count, $middlepage_line_count, $carry_forward, $header);
             $client = $this->db->get('*', 'receipt_to', 'id = ? AND userkey = ?', [$client_id, $this->uid]);
+
+            $tax_rates = ['tax_rate' => 0, 'reduced_tax_rate' => 0];
+            foreach ($tax_rates as $kind => $rate) {
+                $tax_rates[$kind] = $this->getTaxRate($kind, $issue_date);
+            }
+            $subtotal = [
+                'reduced_tax_rate' => 0,
+                'tax_rate' => 0,
+            ];
+            $tax = [
+                'reduced_tax_rate' => 0,
+                'tax_rate' => 0,
+            ];
+            $mark = [
+                'reduced_tax_rate' => $reduced_tax_mark,
+                'tax_rate' => '',
+            ];
+            foreach ($detail as $page_number => &$unit) {
+                foreach ($unit as &$value) {
+                    $price = $value['price'];
+                    $quantity = $value['quantity'];
+                    $kind = array_search($value['tax_rate'], $tax_rates);
+                    $tax_rate = $tax_rates[$kind];
+                    $sum = (float)$price * (float)$quantity;
+                    $subtotal[$kind] += $sum;
+                    $tax[$kind] += $sum * (float)$tax_rate;
+
+                    $value['content'] = $mark[$kind] . $value['content'];
+                }
+                unset($value);
+            }
+            unset($unit);
+            $header['subtotal1'] = $subtotal['reduced_tax_rate'];
+            $header['subtotal2'] = $subtotal['tax_rate'];
+            $header['tax1'] = $tax['reduced_tax_rate'];
+            $header['tax2'] = $tax['tax_rate'];
         } else {
             $header = [];
             $detail = [];
@@ -496,7 +532,7 @@ class Receipt extends \Gsnowhawk\Srm
                 $detail[$page_number][] = [
                     'page_number' => $page_number,
                     'line_number' => $n,
-                    'content' => $value . $mark[$kind],
+                    'content' => $mark[$kind] . $value,
                     'price' => $preview['price'][$n] ?? '',
                     'quantity' => $preview['quantity'][$n] ?? '',
                     'unit' => $preview['unit'][$n] ?? '',
