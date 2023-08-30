@@ -989,7 +989,23 @@ class Receipt extends \Gsnowhawk\Srm
             [$this->uid, $templatekey]
         );
 
+        $file = $this->privateSavePath().'/suggestion.json';
+        if (file_exists($file)) {
+            $suggests = json_decode(file_get_contents($file), true);
+            $ignore = $suggests['srm']['ignore'] ?? [];
+            $regex = $suggests['srm']['regex'] ?? [];
+        }
+
+        $list = [];
         foreach ($fetch as $unit) {
+            if (in_array($unit['opt'], $ignore[$column_name] ?? [])) {
+                continue;
+            }
+            foreach ($regex[$column_name] ?? [] as $pattern) {
+                if (preg_match($pattern, $unit['opt'])) {
+                    continue 2;
+                }
+            }
             if (empty($unit['opt'])) {
                 continue;
             }
