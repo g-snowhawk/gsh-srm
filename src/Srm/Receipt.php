@@ -820,6 +820,7 @@ class Receipt extends \Gsnowhawk\Srm
                                     case 'prefix':
                                     case 'suffix':
                                     case 'font':
+                                    case 'default':
                                     case 'align':
                                     case 'valign':
                                     case 'style':
@@ -880,7 +881,8 @@ class Receipt extends \Gsnowhawk\Srm
                 'type' => (string)$child_node->attributes()->type,
                 'flg' => Pdf::mapAttrToBoolean((string)$child_node->attributes()->flg),
                 'poly' => Pdf::mapAttrToArray((string)$child_node->attributes()->poly),
-                'border' => (int)$child_node->attributes()->border
+                'border' => (int)$child_node->attributes()->border,
+                'default' => (string)$child_node->attributes()->default,
             ];
 
             if ($child_node->attributes()->ishtml) {
