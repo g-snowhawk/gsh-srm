@@ -37,6 +37,7 @@ class Srm extends User implements PackageInterface
 
     protected $tax_rate = null;
     protected $reduced_tax_rate = null;
+    protected $suggestion_file = null;
 
     /**
      * Object constructor.
@@ -63,6 +64,8 @@ class Srm extends User implements PackageInterface
                 }
             }
         }
+
+        $this->suggestion_file = $this->privateSavePath().'/suggestion.json';
     }
 
     /**

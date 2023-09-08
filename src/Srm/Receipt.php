@@ -116,6 +116,22 @@ class Receipt extends \Gsnowhawk\Srm
             if (false !== $after_follow) {
                 $this->clone_receipt_number = $post['receipt_number'];
 
+                // Update suggestion file
+                if (file_exists($this->suggestion_file) && is_writable($this->suggestion_file)) {
+                    $origin = file_get_contents($this->suggestion_file);
+                    $suggests = json_decode($origin, true);
+                    foreach (($suggests['srm']['ignore'] ?? []) as $key => $value) {
+                        if (false !== ($i = array_search($post[$key] ?? null, $value))) {
+                            array_splice($value, $i, 1);
+                            $suggests['srm']['ignore'][$key] = $value;
+                        }
+                    }
+                    $new = json_encode($suggests, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);
+                    if ($origin !== $new) {
+                        @file_put_contents($this->suggestion_file, $new, LOCK_EX);
+                    }
+                }
+
                 return $this->db->commit();
             }
         }
@@ -991,9 +1007,8 @@ class Receipt extends \Gsnowhawk\Srm
             [$this->uid, $templatekey]
         );
 
-        $file = $this->privateSavePath().'/suggestion.json';
-        if (file_exists($file)) {
-            $suggests = json_decode(file_get_contents($file), true);
+        if (file_exists($this->suggestion_file)) {
+            $suggests = json_decode(file_get_contents($this->suggestion_file), true);
             $ignore = $suggests['srm']['ignore'] ?? [];
             $regex = $suggests['srm']['regex'] ?? [];
         }
