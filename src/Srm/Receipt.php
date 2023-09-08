@@ -431,6 +431,10 @@ class Receipt extends \Gsnowhawk\Srm
 
     protected function outputPdf($client_id, $receiptkey, $preview = null): bool
     {
+        $ml = $this->app->cnf('pdf:memory_limit');
+        if (!empty($ml)) {
+            ini_set('memory_limit', $ml);
+        }
         $encrypt_to = ['modify','copy','annot-forms','fill-forms','extract','assemble','print-high'];
         if (is_null($preview)) {
             list($year, $month, $day, $receipt_number, $userkey, $templatekey, $draft) = explode('-', $receiptkey);
