@@ -65,7 +65,9 @@ class Srm extends User implements PackageInterface
             }
         }
 
-        $this->suggestion_file = $this->privateSavePath().'/suggestion.json';
+        if (php_sapi_name() !== 'cli') {
+            $this->suggestion_file = $this->privateSavePath().'/suggestion.json';
+        }
     }
 
     /**
