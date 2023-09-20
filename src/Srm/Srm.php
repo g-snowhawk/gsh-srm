@@ -37,7 +37,7 @@ class Srm extends User implements PackageInterface
 
     protected $tax_rate = null;
     protected $reduced_tax_rate = null;
-    protected $suggestion_file = null;
+    protected $suggestion_file = '';
 
     /**
      * Object constructor.
