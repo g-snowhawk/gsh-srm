@@ -1023,7 +1023,7 @@ class Receipt extends \Gsnowhawk\Srm
                 continue;
             }
             foreach ($regex[$column_name] ?? [] as $pattern) {
-                if (preg_match($pattern, $unit['opt'])) {
+                if (preg_match($pattern, $unit['opt'] ?? '')) {
                     continue 2;
                 }
             }
