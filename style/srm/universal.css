@@ -406,57 +406,57 @@ ul.button-list li a:hover {
   white-space: pre;
 }
 
-#srm-receipt-default .section-list {
+html.srm-receipt-list .section-list {
   margin-bottom: 3rem;
 }
-#srm-receipt-default .section-list section {
+html.srm-receipt-list .section-list section {
   border-bottom: 1px dotted #ccc;
 }
-#srm-receipt-default .section-list section h2 {
+html.srm-receipt-list .section-list section h2 {
   margin-bottom: 0;
 }
-#srm-receipt-default .section-list section h3 {
+html.srm-receipt-list .section-list section h3 {
   display: inline;
   font-size: .8rem;
   margin-right: .5em;
 }
-#srm-receipt-default .section-list section h3 + p {
+html.srm-receipt-list .section-list section h3 + p {
   color: #999;
   display: inline;
   font-size: .75rem;
 }
-#srm-receipt-default .section-list section .billing-date {
+html.srm-receipt-list .section-list section .billing-date {
   color: #808080;
   display: inline;
   font-size: .75rem;
 }
-#srm-receipt-default .section-list section .billing-date.future {
+html.srm-receipt-list .section-list section .billing-date.future {
   color: #96f;
 }
-#srm-receipt-default .section-list section .bill-info {
+html.srm-receipt-list .section-list section .bill-info {
   color: #333;
   font-size: .8rem;
   margin-left: 1em;
 }
-#srm-receipt-default .section-list section .bill-info strong {
+html.srm-receipt-list .section-list section .bill-info strong {
   color: #f00;
   font-weight: normal;
 }
-#srm-receipt-default .section-list section .bill-info b {
+html.srm-receipt-list .section-list section .bill-info b {
   color: #090;
   font-weight: normal;
 }
-#srm-receipt-default .section-list section .bill-info i {
+html.srm-receipt-list .section-list section .bill-info i {
   color: #808080;
   font-style: normal;
 }
-#srm-receipt-default .section-list section nav {
+html.srm-receipt-list .section-list section nav {
   margin: 1.25em auto .5em;
   text-align: right;
 }
 #receipt-edit a.like-button,
-#srm-receipt-default .section-list section nav span,
-#srm-receipt-default .section-list section nav a {
+html.srm-receipt-list .section-list section nav span,
+html.srm-receipt-list .section-list section nav a {
   background: rgba(0,0,0,.1);
   border-radius: 4px;
   color: #666;
@@ -468,21 +468,36 @@ ul.button-list li a:hover {
   text-decoration: none;
   transition: all .5s ease;
 }
-#srm-receipt-default .section-list section nav span {
+html.srm-receipt-list .section-list section nav span {
   background: transparent;
 }
-#srm-receipt-default .explorer-list .footer-controls .flexbox {
+html.srm-receipt-list .section-list section nav .receipt-type {
+  background-color: #dfdfdf;
+}
+html.srm-receipt-list .section-list section nav .receipt-type.bill {
+  background-color: #390;
+  color: #fff;
+}
+html.srm-receipt-list .section-list section nav .receipt-type.estimate {
+  background-color: #039;
+  color: #fff;
+}
+html.srm-receipt-list .section-list section nav .receipt-type.confirmation {
+  background-color: #000;
+  color: #fff;
+}
+html.srm-receipt-list .explorer-list .footer-controls .flexbox {
   align-items: center;
   display: flex;
 }
-#srm-receipt-default input.search-query {
+html.srm-receipt-list input.search-query {
   border-radius: 4px;
   line-height: 1;
   margin: auto .5em;
   padding: 4px 20px 4px 4px;
   vertical-align: middle;
 }
-#srm-receipt-default input.search-query + button.clear-search {
+html.srm-receipt-list input.search-query + button.clear-search {
   background: transparent url("clear-button.png") no-repeat 50% 50%;
   background-size: contain;
   border: 0 none transparent;
@@ -496,7 +511,7 @@ ul.button-list li a:hover {
   text-align: center;
   width: 16px;
 }
-#srm-receipt-default .explorer-list .footer-controls a.normal-link {
+html.srm-receipt-list .explorer-list .footer-controls a.normal-link {
   align-self: center;
   background: transparent;
   border-radius: 0;
@@ -506,12 +521,12 @@ ul.button-list li a:hover {
   padding: 0;
   width: auto;
 }
-#srm-receipt-default .explorer-list .footer-controls a.options {
+html.srm-receipt-list .explorer-list .footer-controls a.options {
   font-size: .75rem;
 }
 
 #receipt-edit a.like-button:hover,
-#srm-receipt-default .section-list section nav a:hover {
+html.srm-receipt-list .section-list section nav a:hover {
   background: #39c;
   color: #fff;
 }
@@ -519,20 +534,23 @@ ul.button-list li a:hover {
   margin-left: 2em;
 }
 
-#srm-receipt-default .section-list section nav.flex-block {
+html.srm-receipt-list .section-list section nav.flex-block {
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
 }
 
-#srm-receipt-default .section-list section .bill-info.strike,
-#srm-receipt-default .section-list section.unavailable h2,
-#srm-receipt-default .section-list section.unavailable h3,
-#srm-receipt-default .section-list section.unavailable h3 + p {
+html.srm-receipt-list .section-list section .bill-info.strike,
+html.srm-receipt-list .section-list section.unavailable h2,
+html.srm-receipt-list .section-list section.unavailable h3,
+html.srm-receipt-list .section-list section.unavailable h3 + p {
   color: #999;
   text-decoration: line-through;
   text-decoration-color: rgba(255,0,0,0.6);
   text-decoration-style: double;
+}
+#srm-receipt-accept .section-list section nav.flex-block {
+  flex-direction: row;
 }
 
 

@@ -190,6 +190,7 @@ class Response extends \Gsnowhawk\Srm\Receipt
             $this->view->bind('receipts', $receipts);
 
             $this->setHtmlId('srm-receipt-default');
+            $this->appendHtmlClass('srm-receipt-list');
 
             $globals = $this->view->param();
             $form = $globals['form'];

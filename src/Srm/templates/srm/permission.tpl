@@ -19,7 +19,7 @@
           <td>{% if apps.userinfo.admin == 1 or priv.receipt.read   == 1 %}<input type="checkbox" value="1" name="perm[{{ filters }}srm.receipt.read]"  {% if post.perm[filters ~ 'srm.receipt.read']   == 1 %} checked{% endif %}>{% else %}-{% endif %}</td>
           <td>{% if apps.userinfo.admin == 1 or priv.receipt.update == 1 %}<input type="checkbox" value="1" name="perm[{{ filters }}srm.receipt.update]"{% if post.perm[filters ~ 'srm.receipt.update'] == 1 %} checked{% endif %}>{% else %}-{% endif %}</td>
           <td>{% if apps.userinfo.admin == 1 or priv.receipt.delete == 1 %}<input type="checkbox" value="1" name="perm[{{ filters }}srm.receipt.delete]"{% if post.perm[filters ~ 'srm.receipt.delete'] == 1 %} checked{% endif %}>{% else %}-{% endif %}</td>
-          <td>-</td>
+          <td>{% if apps.userinfo.admin == 1 or priv.receipt.accept == 1 %}<input type="checkbox" value="1" name="perm[{{ filters }}srm.receipt.accept]"{% if post.perm[filters ~ 'srm.receipt.accept'] == 1 %} checked{% endif %}>{% else %}-{% endif %}受理</td>
         </tr>
         <tr>
           <th>取引先</th>

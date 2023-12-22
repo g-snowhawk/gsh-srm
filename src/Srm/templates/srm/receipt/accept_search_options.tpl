@@ -24,7 +24,7 @@
   </div>
 
   <div class="form-footer">
-    <input type="hidden" name="mode" value="srm.receipt.receive:save-search-options">
+    <input type="hidden" name="mode" value="srm.receipt.accept:save-search-options">
     <input type="submit" name="s1_submit" value="保存">
     <input type="submit" name="s1_clear" value="クリア">
   </div>
