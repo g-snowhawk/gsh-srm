@@ -24,6 +24,7 @@ class Accept extends \Gsnowhawk\Srm\Receipt
     public const QUERY_STRING_KEY = 'receipt_accept_search_condition';
     public const SEARCH_OPTIONS_KEY = 'receipt_accept_search_options';
     public const RECEIPT_PAGE_KEY = 'receipt_accept_page';
+    public const PAGER_MODE = 'srm.receipt.accept';
 
     private $rows_per_page = 10;
 
@@ -191,7 +192,7 @@ class Accept extends \Gsnowhawk\Srm\Receipt
             $pager = clone $this->pager;
             $pager->init($total_count, $rows_per_page);
             $pager->setCurrentPage($current_page);
-            $pager->setLinkFormat($this->app->systemURI().'?mode='.parent::DEFAULT_MODE.'&p=%d');
+            $pager->setLinkFormat($this->app->systemURI().'?mode='.self::PAGER_MODE.'&p=%d');
             $this->view->bind('pager', $pager);
             $statement .= " LIMIT $offset_list,$rows_per_page";
 

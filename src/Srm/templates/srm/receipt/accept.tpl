@@ -35,9 +35,6 @@
           <h2>{{ unit.subject }}</h2>
           <h3>{{ unit.host }}</h3>
           <p>No.{{ unit.receipt_number }}&nbsp;発行日：{{ unit.issue_date|date('Y年m月d日') }}{% if mail == 'enable' and unit.draft != '1' and unit.unavailable != '1' %}&nbsp;<a href="?mode=srm.receipt.response:mailer&id={{ unit.issue_date|date('Y-m-d') ~ ':' ~ unit.receipt_number }}" class="run-mailer{% if unit.logtime is not empty %} log-exists" data-content="最終送信日:{{ unit.logtime|date('Y年m月d日') }}{% endif %}">E-mail</a>{% endif %}</p>
-          {% if unit.billing_date is not empty %}
-            <p class="billing-date{% if date(unit.billing_date) >= date('now'|date('Y-m-d 00:00:00')) %} future{% endif %}">締日：{{ unit.billing_date|date('Y年m月d日') }}</p>
-          {% endif %}
           {% if typeOf == 'bill' or typeOf == 'receipt' %}
             <p class="bill-info{% if unit.unavailable == '1' %} strike{% endif %}">
             支払期限：{% if unit.due_date is not empty %}<i>{{ unit.due_date|date('Y年m月d日') }}</i>{% endif %}<br>
@@ -78,9 +75,6 @@
     <div class="explorer-list">
       <div class="footer-controls">
         <nav class="links flexbox">
-          {% if apps.hasPermission('srm.receipt.create') %}
-          <a href="?mode=srm.receipt.response:edit"><mark>＋</mark>新規{{ receiptName }}作成</a>
-          {% endif %}
           <input type="text" name="search_query" id="search-query-1" class="search-query"{% if queryString %} value="{{ queryString }}"{% endif %}>
           <button type="reset" class="clear-search">×</button>
           <a href="?mode=srm.receipt.accept:search-options" class="normal-link options subform-opener">検索オプション</a>
