@@ -379,6 +379,15 @@ class Response extends \Gsnowhawk\Srm\Receipt
         );
         $this->view->bind('clients', $clients);
 
+        // Sharing groups
+        $groups = [];
+        if (false !== ($fetch = $this->db->select('id,label', 'group', 'WHERE userkey = ? ORDER BY label', [$this->uid]))) {
+            while ($unit = array_shift($fetch)) {
+                $groups[] = $unit;
+            }
+        }
+        $this->view->bind('groups', $groups);
+
         $globals = $this->view->param();
         $form = $globals['form'];
         $form['confirm'] = Lang::translate('CONFIRM_SAVE_DATA');

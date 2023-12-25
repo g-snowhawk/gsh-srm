@@ -486,4 +486,36 @@ class Receive extends Response
 
         $this->outputPdf(null, null, $post);
     }
+
+    public function sharing(): void
+    {
+        $json = [
+            'status' => 1,
+            'message' => 'System Error',
+        ];
+
+        $receipt_id = $this->session->param('receipt_id');
+        $statement = 'issue_date = ? AND receipt_number = ? AND userkey = ? AND templatekey = ? AND draft <> ?';
+        $replace = [
+            $this->request->param('issue_date'),
+            $this->request->param('receipt_number'),
+            $this->uid,
+            $receipt_id,
+            '1'
+        ];
+        $shared = (empty($this->request->param('shared'))) ? null : $this->request->param('shared');
+
+        if ($this->db->begin()
+            && $this->db->update('receipt', [ 'shared' => $shared ], $statement, $replace)
+            && $this->db->commit()
+        ) {
+            $str = (empty($shared)) ? 'Unshared' : 'Shared';
+            $json = [
+                'status' => 0,
+                'message' => $str.' the receipt.',
+            ];
+        }
+
+        $this->responseJson($json);
+    }
 }

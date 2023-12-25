@@ -25,6 +25,7 @@ const buttonDelete = document.querySelector('input[name=s1_delete]');
 const buttonAvailable = document.querySelector('a[class*=availables]');
 const buttonAddPage = document.querySelector('input[name=s1_addpage]');
 const buttonPreview = document.querySelector('input[name=s2_preview]');
+const sharedSelector = document.querySelector('select[name=shared]');
 
 const displayTaxRate = document.getElementById('tax-rate');
 const taxRate = (displayTaxRate) ? parseFloat(displayTaxRate.dataset.rate) : NaN;
@@ -164,6 +165,10 @@ function initializeReceiptEditor(event) {
             line2.setAttribute("stroke-width","2");
             svg.appendChild(line2);
         }
+    }
+
+    if (sharedSelector) {
+        sharedSelector.addEventListener('change', shareReceipt);
     }
 }
 
@@ -884,4 +889,57 @@ function zoomPreviewImage(event) {
     } else {
         element.width = element.dataset.natualWidth;
     }
+}
+
+function shareReceipt(event) {
+    const element = event.target;
+    const form = element.form
+
+    //let data = new FormData(form);
+    //data.set('mode', 'srm.receipt.receive:sharing');
+
+    let data = new FormData();
+    data.append('stub', form.stub.value);
+    data.append('issue_date', form.issue_date.value);
+    data.append('receipt_number', form.receipt_number.value);
+    data.append('shared', element.options[element.selectedIndex].value);
+    data.append('mode', 'srm.receipt.receive:sharing');
+
+    if (isFetching) {
+        fetchCanceller.abort();
+        isFetching = false;
+    }
+
+    isFetching = true;
+    fetch(form.action, {
+        signal: fetchCanceller.signal,
+        method: 'POST',
+        credentials: 'same-origin',
+        body: data,
+    }).then(response => {
+        if (response.ok) {
+            let contentType = response.headers.get("content-type");
+            if (contentType.match(/^application\/json/)) {
+                return response.json();
+            }
+            throw new Error('Unexpected response'.translate());
+        } else {
+            throw new Error('Server Error'.translate());
+        }
+    }).then(json => {
+        if (json.status === 0) {
+            alert(json.message);
+        } else {
+            throw new Error(json.message);
+        }
+    }).catch(error => {
+        if (error.name === 'AbortError') {
+            console.warn("Aborted!!");
+            fetchCanceller = new AbortController()
+        } else {
+            console.error(error)
+        }
+    }).then(() => {
+        isFetching = false;
+    });
 }

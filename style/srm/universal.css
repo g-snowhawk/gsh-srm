@@ -533,6 +533,16 @@ html.srm-receipt-list .section-list section nav a:hover {
 #receipt-edit a.availables {
   margin-left: 2em;
 }
+#receipt-edit .adjacent-block .controls {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+  #receipt-edit .adjacent-block .controls a.like-button {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+  }
 
 html.srm-receipt-list .section-list section nav.flex-block {
   display: flex;

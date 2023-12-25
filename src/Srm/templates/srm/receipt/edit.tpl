@@ -189,9 +189,21 @@
       {% else %}
         <div class="adjacent-block">
           <p>この{{ receiptName }}は確定済みです。これ以上変更できません</p>
-          <p>
-            <a href="?mode=srm.receipt.response" class="like-button">キャンセル<a>
+          <p class="controls">
+            <a href="?mode=srm.receipt.response" class="like-button">キャンセル</a>
             <a href="?mode=srm.receipt.response:download-pdf&amp;id={{ post.issue_date|date('Y-m-d') ~ ':' ~ post.receipt_number }}" target="_blank" class="like-button">PDF</a>
+
+            {% for group in groups %}
+              {% if loop.first %}
+              <select name="shared" id="shared" class="never">
+                <option value="">シェアしない</option>
+              {% endif %}
+                <option value="{{ group.id }}"{% if post.shared == group.id %} selected{% endif %}>{{ group.label }}</option>
+              {% if loop.last %}
+              </select>
+              {% endif %}
+            {% endfor %}
+
             {% if post.unavailable == '0' %}
             <a href="?mode=srm.receipt.receive:unavailable&amp;id={{ post.issue_date|date('Y-m-d') ~ ':' ~ post.receipt_number }}" class="like-button availables" data-prompt="無効にする理由" data-alert="理由がなければ無効にできません">無効にする</a>
             {% else %}
