@@ -37,7 +37,7 @@ SQL;
 $statement = <<<SQL
 SELECT issue_date,receipt_number,subject,draft,
        due_date,receipt,unavailable,
-       userkey,templatekey,`hash`
+       userkey,templatekey,`hash`,
        company
   FROM (SELECT r.issue_date,r.receipt_number,r.subject,r.draft,
                r.due_date,r.receipt,r.unavailable,

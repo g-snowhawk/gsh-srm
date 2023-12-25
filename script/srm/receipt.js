@@ -47,13 +47,11 @@ function initializeReceiptList(event) {
 }
 
 function getSearchURI(keywords) {
-    let query = location.search.replace(/[&\?]?[qp]=[^=&\?]+/g, '');
+    let query = location.search.replace(/[&\?]?[qp]=[^=&\?]+/g, '').replace(/q=&/g, '').replace(/q=$/g, '').replace(/&$/, '');
     const separator = query.length > 0 ? '&' : '?';
-    query += separator + "p=1";
-    if (keywords !== undefined && keywords.length > 0) {
-        query += "&q=" + encodeURIComponent(element.value);
-    }
-    return location.pathname + query;
+    query += separator + "p=1" + "&q=" + encodeURIComponent(keywords || '');
+
+    return location.pathname + query.replace(/^&/g, '?');
 }
 
 function execSearchReceipt(event) {
@@ -67,7 +65,7 @@ function execSearchReceipt(event) {
             }
             if (prev.nodeName.toLowerCase() === 'input') {
                 prev.value = '';
-                location.href = getSearchURI() + '&q=';
+                location.href = getSearchURI();
             }
             return;
         case "compositionend":
