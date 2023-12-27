@@ -1221,7 +1221,7 @@ class Receipt extends \Gsnowhawk\Srm
                     $columns[] = "'1' AS $field";
                 } elseif ($field === 'templatekey' && !empty($destination) && $templatekey !== $destination) {
                     $columns[] = $this->db->quote($destination) . " AS $field";
-                } elseif (in_array($field, $diff)) {
+                } elseif (in_array($field, $diff) || $field === 'shared') {
                     $columns[] = "NULL AS $field";
                 } else {
                     $columns[] = "$field";
