@@ -557,9 +557,9 @@ class Response extends \Gsnowhawk\Srm\Receipt
         $records = $this->db->select(
             '*',
             'receipt',
-            'WHERE billing_date = ?'.
+            'WHERE billing_date = ? AND unavailable = ?'.
             'ORDER BY userkey, issue_date, receipt_number',
-            [$today]
+            [$today, '0']
         );
 
         $data = [];

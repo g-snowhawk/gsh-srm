@@ -15,6 +15,18 @@ CREATE TABLE IF NOT EXISTS `table::bank` (
   CONSTRAINT `table::bank_ibfk_1` FOREIGN KEY (`userkey`) REFERENCES `table::user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `table::group` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `userkey` int unsigned NOT NULL,
+  `label` varchar(32) NOT NULL,
+  `users` text NOT NULL,
+  `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modify_date` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `table::group_ibfk_1` (`userkey`),
+  CONSTRAINT `table::group_ibfk_1` FOREIGN KEY (`userkey`) REFERENCES `table::user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `table::receipt_template` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `userkey` int unsigned NOT NULL,
@@ -57,6 +69,7 @@ CREATE TABLE IF NOT EXISTS `table::receipt` (
   `templatekey` int unsigned NOT NULL,
   `draft` enum('0','1') NOT NULL DEFAULT '1',
   `client_id` varchar(32) NOT NULL,
+  `shared` int unsigned DEFAULT NULL,
   `subject` varchar(66) DEFAULT NULL,
   `bank_id` varchar(15) DEFAULT NULL,
   `due_date` date DEFAULT NULL,

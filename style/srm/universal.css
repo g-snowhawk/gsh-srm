@@ -559,6 +559,9 @@ html.srm-receipt-list .section-list section.unavailable h3 + p {
   text-decoration-color: rgba(255,0,0,0.6);
   text-decoration-style: double;
 }
+html.srm-receipt-list .section-list section.unavailable .billing-date.future {
+  color: transparent;
+}
 #srm-receipt-accept .section-list section nav.flex-block {
   flex-direction: row;
 }
