@@ -420,7 +420,7 @@ class Receipt extends \Gsnowhawk\Srm
         $latest_number = $this->db->get(
             'receipt_number',
             'receipt',
-            $statement . ' ORDER BY issue_date DESC LIMIT 1',
+            $statement . ' ORDER BY issue_date DESC,receipt_number DESC LIMIT 1',
             $options
         );
 
