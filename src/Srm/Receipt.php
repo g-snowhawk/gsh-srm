@@ -386,35 +386,35 @@ class Receipt extends \Gsnowhawk\Srm
         if ($this->app->cnf('srm:allow_renumbering') === '1') {
             $statement .= ' AND issue_date <= ?';
             $options[] = date('Y-m-d', $timestamp);
-        }
 
-        $options_count = count($options);
+            $options_count = count($options);
 
-        switch ($this->app->cnf('srm:reset_receipt_number_type')) {
-            case 'fiscal_year':
-                $year = date('Y', $timestamp);
-                $start_fiscal_year = $this->app->cnf('srm:start_fiscal_year');
-                if (empty($start_fiscal_year)) {
-                    $start_fiscal_year = '04-01';
-                }
+            switch ($this->app->cnf('srm:reset_receipt_number_type')) {
+                case 'fiscal_year':
+                    $year = date('Y', $timestamp);
+                    $start_fiscal_year = $this->app->cnf('srm:start_fiscal_year');
+                    if (empty($start_fiscal_year)) {
+                        $start_fiscal_year = '04-01';
+                    }
 
-                // TODO: $start_fiscal_year should be checked with valid date formats
-                // else {
-                //     ...
-                // }
+                    // TODO: $start_fiscal_year should be checked with valid date formats
+                    // else {
+                    //     ...
+                    // }
 
-                $issue_date = "$year-$start_fiscal_year";
-                $options[] = date('Y-m-d', strtotime($issue_date));
-                break;
-            case 'year':
-                $options[] = date('Y-01-01', $timestamp);
-                break;
-            case 'month':
-                $options[] = date('Y-m-01', $timestamp);
-                break;
-        }
-        if (count($options) > $options_count) {
-            $statement .= ' AND issue_date >= ?';
+                    $issue_date = "$year-$start_fiscal_year";
+                    $options[] = date('Y-m-d', strtotime($issue_date));
+                    break;
+                case 'year':
+                    $options[] = date('Y-01-01', $timestamp);
+                    break;
+                case 'month':
+                    $options[] = date('Y-m-01', $timestamp);
+                    break;
+            }
+            if (count($options) > $options_count) {
+                $statement .= ' AND issue_date >= ?';
+            }
         }
 
         $latest_number = $this->db->get(
