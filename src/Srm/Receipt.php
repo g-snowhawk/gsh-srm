@@ -429,14 +429,14 @@ class Receipt extends \Gsnowhawk\Srm
         return (int)$latest_number + 1;
     }
 
-    protected function outputPdf($client_id, $receiptkey, $preview = null): bool
+    protected function outputPdf($client_id, $receiptkey, array $preview = []): bool
     {
         $ml = $this->app->cnf('pdf:memory_limit');
         if (!empty($ml)) {
             ini_set('memory_limit', $ml);
         }
         $encrypt_to = ['modify','copy','annot-forms','fill-forms','extract','assemble','print-high'];
-        if (is_null($preview)) {
+        if (empty($preview)) {
             list($year, $month, $day, $receipt_number, $userkey, $templatekey, $draft) = explode('-', $receiptkey);
             $issue_date = implode('-', [$year, $month, $day]);
         } else {
@@ -468,7 +468,7 @@ class Receipt extends \Gsnowhawk\Srm
         $carry_forward = (isset($pdf_mapper->detail->attributes()->carryforward))
             ? (string)$pdf_mapper->detail->attributes()->carryforward : null;
 
-        if (is_null($preview)) {
+        if (empty($preview)) {
             $header = $this->db->get('*', 'receipt', "CONCAT(issue_date,'-',receipt_number,'-',userkey,'-',templatekey,'-',draft) = ?", [$receiptkey]);
             $header['note'] = $this->db->get('content', 'receipt_note', "CONCAT(issue_date,'-',receipt_number,'-',userkey,'-',templatekey,'-',draft) = ?", [$receiptkey]);
             $detail = $this->receiptDetailsForPdf($receiptkey, $line_count, $middlepage_line_count, $carry_forward, $header);
@@ -494,6 +494,11 @@ class Receipt extends \Gsnowhawk\Srm
                 foreach ($unit as &$value) {
                     $price = $value['price'];
                     $quantity = $value['quantity'];
+
+                    if (empty($value['tax_rate'])) {
+                        continue;
+                    }
+
                     $kind = array_search($value['tax_rate'], $tax_rates);
                     $tax_rate = $tax_rates[$kind];
                     $sum = (float)$price * (float)$quantity;
@@ -527,7 +532,6 @@ class Receipt extends \Gsnowhawk\Srm
                 $tax_rates[$kind] = $this->getTaxRate($kind, $issue_date);
             }
 
-            $page_number = $preview['page_number'] ?? 1;
             $subtotal = [
                 'reduced_tax_rate' => 0,
                 'tax_rate' => 0,
@@ -540,25 +544,51 @@ class Receipt extends \Gsnowhawk\Srm
                 'reduced_tax_rate' => $reduced_tax_mark,
                 'tax_rate' => '',
             ];
-            foreach ($preview['content'] as $n => $value) {
-                $price = $preview['price'][$n] ?? '';
-                $quantity = $preview['quantity'][$n] ?? '';
-                $kind = (($preview['reduced_tax_rate'][$n] ?? '') === '1')
-                    ? 'reduced_tax_rate' : 'tax_rate';
-                $tax_rate = $tax_rates[$kind];
-                $sum = (float)$price * (float)$quantity;
-                $subtotal[$kind] += $sum;
-                $tax[$kind] += $sum * (float)$tax_rate;
-                $detail[$page_number][] = [
-                    'page_number' => $page_number,
-                    'line_number' => $n,
-                    'content' => $mark[$kind] . $value,
-                    'price' => $preview['price'][$n] ?? '',
-                    'quantity' => $preview['quantity'][$n] ?? '',
-                    'unit' => $preview['unit'][$n] ?? '',
-                    'sum' => (($sum > 0) ? $sum : ''),
-                ];
+
+            $detail = $this->receiptDetailsForPdf($receiptkey, $line_count, $middlepage_line_count, $carry_forward, $header);
+            foreach ($detail as $page_number => &$unit) {
+                if ($page_number === (int) ($preview['page_number'] ?? 1)) {
+                    foreach ($preview['content'] as $n => $value) {
+                        $price = $preview['price'][$n] ?? '';
+                        $quantity = $preview['quantity'][$n] ?? '';
+                        $kind = (($preview['reduced_tax_rate'][$n] ?? '') === '1')
+                            ? 'reduced_tax_rate' : 'tax_rate';
+                        $tax_rate = $tax_rates[$kind];
+                        $sum = (float)$price * (float)$quantity;
+                        $subtotal[$kind] += $sum;
+                        $tax[$kind] += $sum * (float)$tax_rate;
+                        //$detail[$page_number][] = [
+                        $unit['page_number'] = $page_number;
+                        $unit['line_number'] = $n;
+                        $unit['content'] = $mark[$kind] . $value;
+                        $unit['price'] = $preview['price'][$n] ?? '';
+                        $unit['quantity'] = $preview['quantity'][$n] ?? '';
+                        $unit['unit'] = $preview['unit'][$n] ?? '';
+                        $unit['sum'] = (($sum > 0) ? $sum : '');
+                        //];
+                    }
+                    continue;
+                }
+                foreach ($unit as &$value) {
+                    $price = $value['price'];
+                    $quantity = $value['quantity'];
+
+                    if (empty($value['tax_rate'])) {
+                        continue;
+                    }
+
+                    $kind = array_search($value['tax_rate'], $tax_rates);
+                    $tax_rate = $tax_rates[$kind];
+                    $sum = (float)$price * (float)$quantity;
+                    $subtotal[$kind] += $sum;
+                    $tax[$kind] += $sum * (float)$tax_rate;
+
+                    $value['content'] = $mark[$kind] . $value['content'];
+                }
+                unset($value);
             }
+            unset($unit);
+
             $header['subtotal'] = array_sum($subtotal);
             $header['subtotal1'] = $subtotal['reduced_tax_rate'];
             $header['subtotal2'] = $subtotal['tax_rate'];
@@ -632,7 +662,7 @@ class Receipt extends \Gsnowhawk\Srm
 
             $pdf->addPageFromTemplate($import_page);
 
-            if (!is_null($preview)) {
+            if (!empty($preview)) {
                 $watermark = __DIR__.'/templates/srm/receipt/watermark_draft.png';
                 $size = getimagesize($watermark);
                 $hd = $pdf->handler();
@@ -684,7 +714,7 @@ class Receipt extends \Gsnowhawk\Srm
             }
         }
 
-        if (!is_null($preview)) {
+        if (!empty($preview)) {
             if (class_exists('Imagick')) {
                 $bg = $pdf_mapper->attributes()->bgcolor ?? '#ffffff';
                 $density = 144;
@@ -695,8 +725,9 @@ class Receipt extends \Gsnowhawk\Srm
                 $pdf->saveFileAs($tmpfile);
 
                 try {
+                    $index = ($preview['page_number'] ?? 1) - 1;
                     $convert->readImage($tmpfile);
-                    $convert->setIteratorIndex(0);
+                    $convert->setIteratorIndex($index);
                     $convert->setImageBackgroundColor($bg);
                     $convert->setImageAlphaChannel(\Imagick::ALPHACHANNEL_REMOVE);
                     //$convert->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);

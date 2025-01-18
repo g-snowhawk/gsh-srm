@@ -484,7 +484,14 @@ class Receive extends Response
             $post['templatekey'] = $this->session->param('receipt_id');
         }
 
-        $this->outputPdf(null, null, $post);
+        $key_array = [];
+        $key_array[] = date('Y-m-d', strtotime($post['issue_date']));
+        $key_array[] = $post['receipt_number'];
+        $key_array[] = $this->uid;
+        $key_array[] = $this->session->param('receipt_id');
+        $key_array[] = '1';
+
+        $this->outputPdf(null, implode('-', $key_array), $post);
     }
 
     public function sharing(): void

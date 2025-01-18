@@ -345,27 +345,52 @@ class Response extends \Gsnowhawk\Srm\Receipt
             $post['page_number'] = $page_count;
         }
 
-        if (isset($post['page_number']) && $post['page_number'] > 1) {
+        $page_number = (empty($post['page_number'])) ? 1 : $post['page_number'];
+        if ($page_number > 1) {
             if (!empty($middlepage_line_count)) {
                 $receipt_detail_lines = $middlepage_line_count;
             }
 
+            $carry_forward1 = 0;
+            $carry_forward2 = 0;
+            $carry_forward1_tax = 0;
+            $carry_forward2_tax = 0;
             $details = $this->db->select(
                 'price,quantity,tax_rate',
                 'receipt_detail',
                 'WHERE issue_date = ? AND receipt_number = ? AND userkey = ? AND templatekey = ? AND page_number < ?',
-                [$post['issue_date'], $post['receipt_number'], $this->uid, $receipt_id, $post['page_number']]
+                [$post['issue_date'], $post['receipt_number'], $this->uid, $receipt_id, $page_number]
             );
-
-            $carry_forward = 0;
-            $carry_forward_tax = 0;
             foreach ((array)$details as $detail) {
-                $carry_forward += $detail['price'] * $detail['quantity'];
-                $carry_forward_tax = $carry_forward * $detail['tax_rate'];
+                if ($detail['tax_rate'] !== $taxes['reduced_tax_rate']) {
+                    $carry_forward1 += $detail['price'] * $detail['quantity'];
+                    $carry_forward1_tax = $carry_forward1 * $detail['tax_rate'];
+                } else {
+                    $carry_forward2 += $detail['price'] * $detail['quantity'];
+                    $carry_forward2_tax = $carry_forward2 * $detail['tax_rate'];
+                }
             }
-            $this->view->bind('carryForward', $carry_forward);
-            $this->view->bind('carryForwardTax', $carry_forward_tax);
+            $this->view->bind('carryForward1', $carry_forward1);
+            $this->view->bind('carryForward2', $carry_forward2);
+            $this->view->bind('carryForward1Tax', $carry_forward1_tax);
+            $this->view->bind('carryForward2Tax', $carry_forward2_tax);
         }
+
+        // other pages
+        $other_pages = 0;
+        $other_pages_tax = 0;
+        $details = $this->db->select(
+            'price,quantity,tax_rate',
+            'receipt_detail',
+            'WHERE issue_date = ? AND receipt_number = ? AND userkey = ? AND templatekey = ? AND page_number > ?',
+            [$post['issue_date'], $post['receipt_number'], $this->uid, $receipt_id, $page_number]
+        );
+        foreach ((array)$details as $detail) {
+            $other_pages += $detail['price'] * $detail['quantity'];
+            $other_pages_tax = $other_pages * $detail['tax_rate'];
+        }
+        $this->view->bind('otherPages', $other_pages);
+        $this->view->bind('otherPagesTax', $other_pages_tax);
 
         $this->view->bind('lineCount', $receipt_detail_lines);
         $this->view->bind('pageCount', $page_count);

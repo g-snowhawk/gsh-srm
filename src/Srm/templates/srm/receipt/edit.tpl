@@ -117,7 +117,11 @@
           </tr>
           <tr>
             <td colspan="3"><div class="label">合計</div></td>
-            <td><div class="value" id="total">{{ total }}</div></td>
+            <td>
+              <div class="value" id="total">{{ total }}</div>
+              <input type="hidden" name="other_pages" value="{{ otherPages }}">
+              <input type="hidden" name="other_pages_tax" value="{{ otherPagesTax }}">
+            </td>
           </tr>
         </tfoot>
         <tbody>
@@ -130,11 +134,15 @@
                 <td>{{ carryForwardTitle }}</td>
                 <td class="ta-c"><span>*</span></td>
                 <td>
-                  <input type="hidden" name="carry_forward" value="{{ carryForward }}">
+                  <input type="hidden" name="carry_forward1" value="{{ carryForward1 }}">
+                  <input type="hidden" name="carry_forward2" value="{{ carryForward2 }}">
                   <input type="hidden" name="price[1]" value="0">
                 </td>
                 <td>&nbsp;</td>
-                <td><input type="hidden" name="carry_forward_tax" value="{{ carryForwardTax }}">&nbsp;</td>
+                <td>&nbsp;
+                  <input type="hidden" name="carry_forward1_tax" value="{{ carryForward1Tax }}">
+                  <input type="hidden" name="carry_forward2_tax" value="{{ carryForward2Tax }}">
+                </td>
                 <td><div id="sum-0"></div></td>
               </tr>
             {% else %}

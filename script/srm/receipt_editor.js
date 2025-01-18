@@ -251,14 +251,29 @@ function culculateSubTotals(event) {
     let taxtotal1 = 0;
     let taxtotal2 = 0;
 
-    const carryForward = document.querySelector('input[name=carry_forward]');
-    if (carryForward) {
-        subtotal += parseInt(carryForward.value);
+    const carryForward1 = document.querySelector('input[name=carry_forward1]');
+    if (carryForward1) {
+        subtotal1 += parseInt(carryForward1.value);
+        //const displaySum = document.getElementById('sum-0');
+        //displaySum.innerHTML = (subtotal === 0) ? '' : formatter.format(subtotal);
+
+        const carryForward1Tax = document.querySelector('input[name=carry_forward1_tax]');
+        taxtotal1 += parseInt(carryForward1Tax.value);
+    }
+
+    const carryForward2 = document.querySelector('input[name=carry_forward2]');
+    if (carryForward2) {
+        subtotal2 += parseInt(carryForward2.value);
+
+        const carryForward2Tax = document.querySelector('input[name=carry_forward2_tax]');
+        taxtotal2 += parseInt(carryForward2Tax.value);
+    }
+
+    if (subtotal1 > 0 || subtotal2 > 0) {
+        subtotal += subtotal1 + subtotal2;
+        taxtotal += taxtotal1 + taxtotal2;
         const displaySum = document.getElementById('sum-0');
         displaySum.innerHTML = (subtotal === 0) ? '' : formatter.format(subtotal);
-
-        const carryForwardTax = document.querySelector('input[name=carry_forward_tax]');
-        taxtotal += parseInt(carryForwardTax.value);
     }
 
     for (i = 0; i < prices.length; i++) {
@@ -290,9 +305,10 @@ function culculateSubTotals(event) {
                 taxtotal2 += sum * rate;
             }
         }
-        subtotal = subtotal1 + subtotal2;
-        taxtotal = taxtotal1 + taxtotal2;
     }
+    subtotal = subtotal1 + subtotal2;
+    taxtotal = taxtotal1 + taxtotal2;
+
     displaySubtotal.innerHTML = (subtotal === 0) ? '' : formatter.format(subtotal);
     displaySubtotal1.innerHTML = (subtotal1 === 0) ? '' : '<sub>' + (taxRate * 100) + '%</sub>' + formatter.format(subtotal1);
     displaySubtotal2.innerHTML = (subtotal2 === 0) ? '' : '<sub>' + (reducedTaxRate * 100) + '%</sub>' + formatter.format(subtotal2);
@@ -314,7 +330,16 @@ function culculateTotals(event) {
     if (isNaN(additional_1_price)) additional_1_price = 0;
     if (isNaN(additional_2_price)) additional_2_price = 0;
 
-    let total = subtotal + taxtotal + additional_1_price + additional_2_price;
+    let t = 0;
+    const otherPages = document.querySelector('input[name=other_pages]');
+    if (otherPages) {
+        t += parseInt(otherPages.value);
+
+        const otherPagesTax = document.querySelector('input[name=other_pages_tax]');
+        t += parseInt(otherPagesTax.value);
+    }
+
+    let total = subtotal + taxtotal + additional_1_price + additional_2_price + t;
     displayTotal.innerHTML = (total === 0) ? '' : formatter.format(total);
 }
 
