@@ -551,23 +551,19 @@ class Receipt extends \Gsnowhawk\Srm
                     foreach ($preview['content'] as $n => $value) {
                         $price = $preview['price'][$n] ?? '';
                         $quantity = $preview['quantity'][$n] ?? '';
-                        $kind = (($preview['reduced_tax_rate'][$n] ?? '') === '1')
-                            ? 'reduced_tax_rate' : 'tax_rate';
+                        $kind = (($preview['reduced_tax_rate'][$n] ?? '') === '1') ? 'reduced_tax_rate' : 'tax_rate';
                         $tax_rate = $tax_rates[$kind];
                         $sum = (float)$price * (float)$quantity;
-                        $subtotal[$kind] += $sum;
-                        $tax[$kind] += $sum * (float)$tax_rate;
-                        //$detail[$page_number][] = [
-                        $unit['page_number'] = $page_number;
-                        $unit['line_number'] = $n;
-                        $unit['content'] = $mark[$kind] . $value;
-                        $unit['price'] = $preview['price'][$n] ?? '';
-                        $unit['quantity'] = $preview['quantity'][$n] ?? '';
-                        $unit['unit'] = $preview['unit'][$n] ?? '';
-                        $unit['sum'] = (($sum > 0) ? $sum : '');
-                        //];
+                        $i = $n - 1;
+                        $unit[$i]['page_number'] = $page_number;
+                        $unit[$i]['line_number'] = $n;
+                        $unit[$i]['content'] = $mark[$kind] . $value;
+                        $unit[$i]['price'] = $preview['price'][$n] ?? '';
+                        $unit[$i]['quantity'] = $preview['quantity'][$n] ?? '';
+                        $unit[$i]['unit'] = $preview['unit'][$n] ?? '';
+                        $unit[$i]['sum'] = (($sum > 0) ? $sum : '');
+                        $unit[$i]['tax_rate'] = $tax_rate;
                     }
-                    continue;
                 }
                 foreach ($unit as &$value) {
                     $price = $value['price'];
