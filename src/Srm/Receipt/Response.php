@@ -383,7 +383,7 @@ class Response extends \Gsnowhawk\Srm\Receipt
             'price,quantity,tax_rate',
             'receipt_detail',
             'WHERE issue_date = ? AND receipt_number = ? AND userkey = ? AND templatekey = ? AND page_number > ?',
-            [$post['issue_date'], $post['receipt_number'], $this->uid, $receipt_id, $page_number]
+            [$post['issue_date'] ?? '', $post['receipt_number'] ?? '', $this->uid, $receipt_id, $page_number]
         );
         foreach ((array)$details as $detail) {
             $other_pages += $detail['price'] * $detail['quantity'];
