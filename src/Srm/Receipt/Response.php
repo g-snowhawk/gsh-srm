@@ -712,7 +712,10 @@ class Response extends \Gsnowhawk\Srm\Receipt
                 list($header, $body) = preg_split('/(\r\n|\r|\n){2}/', $eml, 2);
 
                 $mail = new Mail();
-                $mail->from(Mail::noreplyAt());
+
+                $from = $this->app->cnf('srm:remind_billing_from') ?? Mail::noreplyAt();
+                $mail->from($from);
+
                 if (preg_match_all('/^([^:]+):\s*([^\r\n]+)/', $header, $match)) {
                     foreach ($match[1] as $i => $key) {
                         $func = strtolower($key);
