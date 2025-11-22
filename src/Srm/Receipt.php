@@ -11,6 +11,7 @@
 namespace Gsnowhawk\Srm;
 
 use DateTime;
+use ErrorException;
 use Gsnowhawk\Pdf;
 
 /**
@@ -1112,7 +1113,7 @@ class Receipt extends \Gsnowhawk\Srm
         }
 
         if (false === $header || false === $detail) {
-            trigger_error($receiptkey, E_USER_ERROR);
+            throw new ErrorException($receiptkey);
         }
 
         $total = [

@@ -10,6 +10,7 @@
 
 namespace Gsnowhawk\Srm\Receipt;
 
+use ErrorException;
 use Gsnowhawk\Common\Http;
 use Gsnowhawk\Common\Lang;
 use Gsnowhawk\Common\Mail;
@@ -171,7 +172,7 @@ class Receive extends Response
     public function unavailable($unavailable = '1')
     {
         if ($this->request->method !== 'post') {
-            trigger_error('Invalid operation', E_USER_ERROR);
+            throw new ErrorException('Invalid operation');
         }
 
         list($issue_date, $receipt_number) = explode(':', $this->request->param('id'));
@@ -486,7 +487,7 @@ class Receive extends Response
 
         $key_array = [];
         $key_array[] = date('Y-m-d', strtotime($post['issue_date']));
-        $key_array[] = $post['receipt_number'];
+        $key_array[] = $post['receipt_number'] ?? null;
         $key_array[] = $this->uid;
         $key_array[] = $this->session->param('receipt_id');
         $key_array[] = '1';

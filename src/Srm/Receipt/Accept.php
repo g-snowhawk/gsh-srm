@@ -10,6 +10,7 @@
 
 namespace Gsnowhawk\Srm\Receipt;
 
+use ErrorException;
 use Gsnowhawk\Common\Lang;
 use Gsnowhawk\Common\Mail;
 
@@ -251,7 +252,7 @@ class Accept extends \Gsnowhawk\Srm\Receipt
 
             $pdf_mapper_source = $this->db->get('pdf_mapper', 'receipt_template', 'id = ? AND userkey = ?', [$templatekey, $item['userkey']]);
             if (empty($pdf_mapper_source)) {
-                trigger_error('System Error', E_USER_ERROR);
+                throw new ErrorException('System Error');
             }
 
             $pdf_mapper = simplexml_load_string($pdf_mapper_source);
@@ -260,7 +261,7 @@ class Accept extends \Gsnowhawk\Srm\Receipt
             $pdf_path = $this->pathToPdf($format, $issue_date, $receipt_number);
 
             if (!file_exists($pdf_path)) {
-                trigger_error('PDF is not found', E_USER_ERROR);
+                throw new ErrorException('PDF is not found');
             }
 
             $format = (string)$pdf_mapper->attributes()->download_name;
@@ -386,7 +387,7 @@ class Accept extends \Gsnowhawk\Srm\Receipt
     //public function remindBilling(): void
     //{
     //    if (php_sapi_name() !== 'cli') {
-    //        trigger_error('Bad Requiest!', E_USER_ERROR);
+    //        throw new ErrorException('Bad Requiest!');
     //    }
 
     //    $today = date('Y-m-d');

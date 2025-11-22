@@ -10,6 +10,7 @@
 
 namespace Gsnowhawk\Srm;
 
+use ErrorException;
 use Gsnowhawk\Common\File;
 
 /**
@@ -174,7 +175,7 @@ class Template extends \Gsnowhawk\Srm
                 if (!file_exists($save_path)) {
                     try {
                         mkdir($save_path, 0777, true);
-                    } catch(\ErrorException $e) {
+                    } catch(ErrorException $e) {
                         return false;
                     }
                 }
